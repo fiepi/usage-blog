@@ -117,11 +117,41 @@
     <div class="row">
       <div class="col s12">
       
+        <article>
+  <div class="card">
+    
+    <div class="card-content" style="cursor: pointer;" onclick="window.location='https://blog.fiepi.com/aria2-config.html'">
+      
+      <span class="card-title">记录 archlinux 下 aria2+https 的配置过程</span>
+      
+      <p style="font-weight: 600; margin-bottom: 10px;"><time datetime="2017-11-04 00:00:00 +0800">04 Nov 2017</time></p>
+      <div id="post-content">
+        1. 安装
+
+
+  sudo pacman -S aria2 certbot nginx
+
+
+2. 配置
+
+假设下载服务器域名为：
+
+aria2.fiepi.com
+
+
+（1） 配置临时 web 服…
+      </div>
+      
+    </div>
+  </div>
+</article>
+
+      
       </div>
       <div class="col s12">
         <ul class="pagination center">
   
-  <li class="waves-effect"><a href="https://blog.fiepi.com/"><i class="material-icons">first_page</i></a></li>
+  <li class="disabled"><a href="#!"><i class="material-icons">first_page</i></a></li>
   
 
   
@@ -131,23 +161,7 @@
   
   
     
-    <li class="waves-effect"><a href="https://blog.fiepi.com/">1</a></li>
-    
-  
-    
-    <li class="waves-effect"><a href="page/2">2</a></li>
-    
-  
-    
-    <li class="waves-effect"><a href="page/3">3</a></li>
-    
-  
-    
-    <li class="waves-effect"><a href="page/4">4</a></li>
-    
-  
-    
-    <li class="waves-effect"><a href="page/5">5</a></li>
+    <li class="active"><a href="#!">1</a></li>
     
   
 
@@ -203,7 +217,7 @@
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/materialize.min.js"></script>
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/prism.min.js"></script>
 <script type="text/javascript">
-  var now = new Date('2017-11-04 15:08:10 +0800').getTime();
+  var now = new Date('2017-11-04 19:26:04 +0800').getTime();
   $(document).ready(function () {
     $('.button-collapse').sideNav();
     $('.collapsible').collapsible();

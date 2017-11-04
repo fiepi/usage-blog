@@ -9,22 +9,22 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="description" content="Notebook">
 <meta name="keywords" content="Programming and Blog">
-<meta name="author" content="About | FIEPI">
+<meta name="author" content="记录 archlinux 下 aria2+https 的配置过程 | FIEPI">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ff5722">
 <meta name="google" content="notranslate">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="About | FIEPI">
+<meta name="twitter:title" content="记录 archlinux 下 aria2+https 的配置过程 | FIEPI">
 <meta name="twitter:description" content="Notebook">
 <meta name="twitter:image" content="https://blog.fiepi.com/assets/img/logo.png">
 <meta property="og:type" content="blog">
 <meta property="og:url" content="https://blog.fiepi.com">
-<meta property="og:title" content="About | FIEPI">
+<meta property="og:title" content="记录 archlinux 下 aria2+https 的配置过程 | FIEPI">
 <meta property="og:description" content="Notebook">
 <meta property="og:image" content="https://blog.fiepi.com/assets/img/logo.png">
-<title>About | FIEPI</title>
-<link rel="canonical" href="https://blog.fiepi.com/about.html">
-<link type="application/xml" rel="sitemap" href="https://blog.fiepi.com/sitemap.xml" title="About | FIEPI"/>
+<title>记录 archlinux 下 aria2+https 的配置过程 | FIEPI</title>
+<link rel="canonical" href="https://blog.fiepi.com/aria2-config.html">
+<link type="application/xml" rel="sitemap" href="https://blog.fiepi.com/sitemap.xml" title="记录 archlinux 下 aria2+https 的配置过程 | FIEPI"/>
 <link type="application/atom+xml" rel="alternate" href="https://blog.fiepi.com/atom.xml" title="FIEPI" />
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Fira+Mono|Material+Icons|Quicksand">
@@ -110,73 +110,273 @@
   </header>
   <main>
     <section>
-      <div class="container">
+      
+
+<div class="container">
   <div class="section">
     <div class="row">
       <div class="col s12">
         <article>
           <div class="card">
+            
             <div class="card-content">
-              <span class="card-title">简介</span>
-              <p>null</p>
-              <div class="row" style="border-top: 1px solid #dddddd; margin-top: 16px; margin-bottom: 0; padding-top: 16px;">
               
+              <span class="card-title truncate">记录 archlinux 下 aria2+https 的配置过程</span>
               
-              
-                <div class="col s1">
-                  <a href="mailto:fiepi.dev@gamil.com" target="_blank"><i class="fa fa-envelope fa-2x fa-fw" aria-hidden="true"></i> </a>
-                </div>
-              
-              
-              
-              
-              
-                <div class="col s1">
-                  <a href="http://github.com/fiepi" target="_blank"><i class="fa fa-github fa-2x fa-fw" aria-hidden="true"></i> </a>
-                </div>
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-                <div class="col s1">
-                  <a href="http://t.me/fiepi" target="_blank"><i class="fa fa-telegram fa-2x fa-fw" aria-hidden="true"> </i> </a>
-                </div>
-              
-              
-                <div class="col s1">
-                  <a href="https://nekopara.cat" target="_blank"><i class="fa fa-tumblr fa-2x fa-fw" aria-hidden="true"></i> </a>
-                </div>
-              
-              
-              
-              
-              
+              <p style="font-weight: 600; margin-bottom: 10px;"><time datetime="">04 Nov 2017</time></p>
+              <div id="post-content">
+                <h1 id="1-安装">1. 安装</h1>
+
+<blockquote>
+  <p>sudo pacman -S aria2 certbot nginx</p>
+</blockquote>
+
+<h1 id="2-配置">2. 配置</h1>
+
+<p>假设下载服务器域名为：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aria2.fiepi.com
+</code></pre></div></div>
+
+<h2 id="1-配置临时-web-服务器获取免费-lets-encrypt-证书">（1） 配置临时 web 服务器获取免费 Let’s Encrypt 证书</h2>
+
+<p>添加</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>include vhost/*.conf;
+</code></pre></div></div>
+
+<p>到</p>
+
+<blockquote>
+  <p>/etc/nginx/nginx.conf</p>
+</blockquote>
+
+<p>创建 nginx 配置文件</p>
+
+<blockquote>
+  <p>sudo mkdir /etc/nginx/vhost</p>
+</blockquote>
+
+<blockquote>
+  <p>sudo vim /etc/nginx/vhost/aria2.fiepi.com.conf</p>
+</blockquote>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>server {
+    listen 80;
+    server_name aria2.fiepi.com;
+    index index.html index.htm;
+    root /home/fiepi/web/root;
+    autoindex on;
+    autoindex_exact_size off;
+    autoindex_localtime on;
+    location / {
+    }
+    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|flv|ico)$ {
+        expires 30d;
+        access_log off;
+    }
+    location ~ .*\.(js|css)?$ {
+        expires 7d;
+        access_log off;
+    }
+}
+</code></pre></div></div>
+
+<p>测试配置无误后重启 nginx 并生成证书</p>
+
+<blockquote>
+  <p>sudo nginx -t</p>
+</blockquote>
+
+<blockquote>
+  <p>sudo systemctl restart nginx.service</p>
+</blockquote>
+
+<blockquote>
+  <p>sudo certbot certonly –webroot -w /home/fiepi/web/root -d aria2.fiepi.com</p>
+</blockquote>
+
+<p>证书路径：</p>
+
+<blockquote>
+  <p>/etc/letsencrypt/archive/aria2.fiepi.com/</p>
+</blockquote>
+
+<p>修改权限让 aria2 能够读取</p>
+
+<blockquote>
+  <p>sudo chown -R fiepi:users /etc/letsencrypt/archive</p>
+</blockquote>
+
+<p>移除临时 web 配置</p>
+
+<blockquote>
+  <p>sudo mv /etc/nginx/vhost/aria2.fiepi.com.conf /etc/nginx/vhost/aria2.fiepi.com.conf.bak</p>
+</blockquote>
+
+<blockquote>
+  <p>sudo systemctl restart nginx.service</p>
+</blockquote>
+
+<h2 id="2创建-aria2-配置">（2）创建 aria2 配置</h2>
+
+<blockquote>
+  <p>mkdir -p ~/.config/aria2</p>
+</blockquote>
+
+<blockquote>
+  <p>vim ~/.config/aria2/aria2.conf</p>
+</blockquote>
+
+<p>随机生成身份认证的 Token：</p>
+
+<blockquote>
+  <p>openssl rand -hex 15</p>
+</blockquote>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 下载路径
+dir=~/Downloads/aria2
+## 生成随机 Token: openssl rand -hex 15
+rpc-secret=xxxxxx
+rpc-secure=true
+## 证书
+rpc-certificate=/etc/letsencrypt/archive/aria2.fiepi.com/fullchain1.pem
+rpc-private-key=/etc/letsencrypt/archive/aria2.fiepi.com/privkey1.pem
+## http代理
+# http-proxy=http://127.0.0.1:8118
+## 上传速度限制 0 为不限制
+max-overall-upload-limit=10K
+max-upload-limit=2K
+## 是否预先分配磁盘空间
+file-allocation=prealloc
+## 是否继续下载未完成的文件
+continue=true
+## 日志级别，可以为debug, info, notice, warn 或 error
+log-level=info
+## 每下载任务最大连接数
+max-connection-per-server=10
+## 下载进度输出的间隔时间
+#summary-interval=120
+## 是否以进程的方式启动
+daemon=true
+## 是否启用rpc
+enable-rpc=true
+## rpc监听端口
+rpc-listen-port=6800
+## 是否在所有网卡上启用监听
+rpc-listen-all=true
+## 最大同时下载任务数，根据实际情况修改
+#max-concurrent-downloads=3
+## 会话保存文件，进程退出时保存未下载完成的会话
+save-session=/home/fiepi/.config/aria2/session.lock
+## 启动输入文件，进程启动时读取上次未下载完成的会话
+input-file=/home/fiepi/.config/aria2/session.lock
+## 日志文件，根据实际情况修改
+#log=~/.config/aria2/aria.log
+## 是否关闭ipv6
+disable-ipv6=true
+## 磁盘缓存
+disk-cache=0
+## 超时时间
+#timeout=600
+## 重试等待时间
+#retry-wait=30
+## 最大重试次数，0代表可以无限次重试
+#max-tries=0
+## user agent，此处所填值用于伪装成百度云网盘客户端
+user-agent=netdisk;4.4.0.6;PC;PC-Windows;6.2.9200 WindowsBaiduYunGuanJia
+</code></pre></div></div>
+
+<h2 id="3创建-systemd-守护进程">（3）创建 systemd 守护进程</h2>
+
+<blockquote>
+  <p>sudo vim /etc/systemd/user/aria2.service</p>
+</blockquote>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Unit]
+Description=Aria2 Service
+After=network.target
+
+[Service]
+Type=forking
+WorkingDirectory=%h
+ExecStart=/usr/bin/aria2c --daemon --enable-rpc --rpc-listen-all --rpc-allow-origin-all -c -D  --conf-path=%h/.config/aria2/aria2.conf
+
+[Install]
+WantedBy=default.target
+</code></pre></div></div>
+<p>启动</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl --user start aria2.service
+
+systemctl --user enable aria2.service
+</code></pre></div></div>
+
+<p>过去用户进程在用户登出时会被杀死，现在 Arch 已经修改了默认编译参数，所以不需要额外的设置。详见  <a href="https://wiki.archlinux.org/index.php/Systemd/User">Arch Wiki Systemd/User</a> 的 <a href="https://wiki.archlinux.org/index.php/Systemd/User#Kill_user_processes_on_logout">Kill user processes on logout</a> 部分。</p>
+
+<h2 id="4防火墙配置">（4）防火墙配置</h2>
+
+<p>打开 6800 端口</p>
+
+<blockquote>
+  <p>sudo vim /etc/iptables/iptables.rules</p>
+</blockquote>
+
+<p>添加</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-A INPUT -p tcp -m tcp --dport 6800 -j ACCEPT
+</code></pre></div></div>
+
+<p>使之生效</p>
+
+<blockquote>
+  <p>sudo iptables-restore &lt; /etc/iptables/iptables.rules</p>
+</blockquote>
+
+<p>最后打开 Yaaw（<a href="https://yaaw.fiepi.com">yaaw.fiepi.com</a>） 前端，填入配置：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://token:xxxxxx@aria2.fiepi.com:6800/jsonrpc
+</code></pre></div></div>
+
               </div>
-            </div>
-          </div>
-        </article>
-        <article>
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title">事件</span>
-              <ul class="collection">
               
-                <li class="collection-item"><strong>2017-11-03</strong><br>开始捣鼓 Jekyll</li>
+              <div class="center" style="margin-top: 16px;">
+                <table>
+                  <tr>
+                    <td>
+                      <span style="font-size: 12px; font-weight: 400; min-height: 31px;">
+                        <img src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" alt="Creative Commons licenses">
+                        原文使用 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.zh">知识共享署名 4.0 国际许可协议</a>。<br>
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
               
-              </ul>
+              <div class="divider" style="margin: 16px 0;"></div>
+              
+                <div class="chip">archlinux</div>
+              
+                <div class="chip">aria2</div>
+              
+                <div class="chip">https</div>
+              
+                <div class="chip">letsencrypt</div>
+              
             </div>
           </div>
         </article>
       </div>
+      
+      <div class="col s12">
+        
+        
+      </div>
     </div>
   </div>
 </div>
+
+
 
     </section>
   </main>
