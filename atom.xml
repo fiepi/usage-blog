@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://blog.fiepi.com/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.fiepi.com/" rel="alternate" type="text/html" /><updated>2017-11-04T19:34:33+08:00</updated><id>https://blog.fiepi.com/</id><title type="html">FIEPI</title><subtitle>Notebook</subtitle><author><name>Mash Kyrielight</name><email>fiepi.dev@gamil.com</email></author><entry><title type="html">记录 archlinux 下 aria2+https 的配置过程</title><link href="https://blog.fiepi.com/aria2-config.html" rel="alternate" type="text/html" title="记录 archlinux 下 aria2+https 的配置过程" /><published>2017-11-04T00:00:00+08:00</published><updated>2017-11-04T00:00:00+08:00</updated><id>https://blog.fiepi.com/aria2-config</id><content type="html" xml:base="https://blog.fiepi.com/aria2-config.html">&lt;h1 id=&quot;1-安装&quot;&gt;1. 安装&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://blog.fiepi.com/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.fiepi.com/" rel="alternate" type="text/html" /><updated>2017-11-04T19:44:45+08:00</updated><id>https://blog.fiepi.com/</id><title type="html">FIEPI</title><subtitle>Notebook</subtitle><author><name>Mash Kyrielight</name><email>fiepi.dev@gamil.com</email></author><entry><title type="html">记录 archlinux 下 aria2+https 的配置过程</title><link href="https://blog.fiepi.com/aria2-config.html" rel="alternate" type="text/html" title="记录 archlinux 下 aria2+https 的配置过程" /><published>2017-11-04T00:00:00+08:00</published><updated>2017-11-04T00:00:00+08:00</updated><id>https://blog.fiepi.com/aria2-config</id><content type="html" xml:base="https://blog.fiepi.com/aria2-config.html">&lt;p&gt;Aria2 是一个轻量的多协议、多线程下载器。这里记录一下安装配置过程。&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;h1 id=&quot;1-安装&quot;&gt;1. 安装&lt;/h1&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;sudo pacman -S aria2 certbot nginx&lt;/p&gt;
@@ -204,4 +208,4 @@ systemctl --user enable aria2.service
 &lt;p&gt;最后打开 Yaaw（&lt;a href=&quot;https://yaaw.fiepi.com&quot;&gt;yaaw.fiepi.com&lt;/a&gt;） 前端，填入配置：&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;https://token:xxxxxx@aria2.fiepi.com:6800/jsonrpc
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>fiepi</name></author><category term="archlinux" /><category term="archlinux" /><category term="aria2" /><category term="https" /><category term="letsencrypt" /><summary type="html">1. 安装</summary></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>fiepi</name></author><category term="archlinux" /><category term="archlinux" /><category term="aria2" /><category term="https" /><category term="letsencrypt" /><summary type="html">Aria2 是一个轻量的多协议、多线程下载器。这里记录一下安装配置过程。</summary></entry></feed>
