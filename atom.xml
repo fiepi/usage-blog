@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://blog.fiepi.com/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.fiepi.com/" rel="alternate" type="text/html" /><updated>2017-11-04T19:26:04+08:00</updated><id>https://blog.fiepi.com/</id><title type="html">FIEPI</title><subtitle>Notebook</subtitle><author><name>Mash Kyrielight</name><email>fiepi.dev@gamil.com</email></author><entry><title type="html">记录 archlinux 下 aria2+https 的配置过程</title><link href="https://blog.fiepi.com/aria2-config.html" rel="alternate" type="text/html" title="记录 archlinux 下 aria2+https 的配置过程" /><published>2017-11-04T00:00:00+08:00</published><updated>2017-11-04T00:00:00+08:00</updated><id>https://blog.fiepi.com/aria2-config</id><content type="html" xml:base="https://blog.fiepi.com/aria2-config.html">&lt;h1 id=&quot;1-安装&quot;&gt;1. 安装&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://blog.fiepi.com/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.fiepi.com/" rel="alternate" type="text/html" /><updated>2017-11-04T19:34:33+08:00</updated><id>https://blog.fiepi.com/</id><title type="html">FIEPI</title><subtitle>Notebook</subtitle><author><name>Mash Kyrielight</name><email>fiepi.dev@gamil.com</email></author><entry><title type="html">记录 archlinux 下 aria2+https 的配置过程</title><link href="https://blog.fiepi.com/aria2-config.html" rel="alternate" type="text/html" title="记录 archlinux 下 aria2+https 的配置过程" /><published>2017-11-04T00:00:00+08:00</published><updated>2017-11-04T00:00:00+08:00</updated><id>https://blog.fiepi.com/aria2-config</id><content type="html" xml:base="https://blog.fiepi.com/aria2-config.html">&lt;h1 id=&quot;1-安装&quot;&gt;1. 安装&lt;/h1&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;sudo pacman -S aria2 certbot nginx&lt;/p&gt;
@@ -57,18 +57,13 @@
 
 &lt;p&gt;测试配置无误后重启 nginx 并生成证书&lt;/p&gt;
 
-&lt;blockquote&gt;
-  &lt;p&gt;sudo nginx -t&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo nginx -t
 
-&lt;blockquote&gt;
-  &lt;p&gt;sudo systemctl restart nginx.service&lt;/p&gt;
-&lt;/blockquote&gt;
+sudo systemctl restart nginx.service
 
-&lt;blockquote&gt;
-  &lt;p&gt;sudo certbot certonly –webroot -w /home/fiepi/web/root -d aria2.fiepi.com&lt;/p&gt;
-&lt;/blockquote&gt;
+sudo certbot certonly --webroot -w /home/fiepi/web/root -d aria2.fiepi.com
 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;证书路径：&lt;/p&gt;
 
 &lt;blockquote&gt;

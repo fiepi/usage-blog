@@ -184,18 +184,13 @@
 
 <p>测试配置无误后重启 nginx 并生成证书</p>
 
-<blockquote>
-  <p>sudo nginx -t</p>
-</blockquote>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo nginx -t
 
-<blockquote>
-  <p>sudo systemctl restart nginx.service</p>
-</blockquote>
+sudo systemctl restart nginx.service
 
-<blockquote>
-  <p>sudo certbot certonly –webroot -w /home/fiepi/web/root -d aria2.fiepi.com</p>
-</blockquote>
+sudo certbot certonly --webroot -w /home/fiepi/web/root -d aria2.fiepi.com
 
+</code></pre></div></div>
 <p>证书路径：</p>
 
 <blockquote>
@@ -414,7 +409,7 @@ systemctl --user enable aria2.service
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/materialize.min.js"></script>
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/prism.min.js"></script>
 <script type="text/javascript">
-  var now = new Date('2017-11-04 19:26:04 +0800').getTime();
+  var now = new Date('2017-11-04 19:34:33 +0800').getTime();
   $(document).ready(function () {
     $('.button-collapse').sideNav();
     $('.collapsible').collapsible();
