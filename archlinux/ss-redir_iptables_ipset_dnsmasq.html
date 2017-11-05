@@ -9,22 +9,22 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="description" content="先輩最低です">
 <meta name="keywords" content="Linux, Arch Linux, Android, and Blog">
-<meta name="author" content="博客评论准则 | 玛修·基列莱特">
+<meta name="author" content="ss-redir+iptables+ipset+dnsmasq 配置记录 | 玛修·基列莱特">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#e91e63">
 <meta name="google" content="notranslate">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="博客评论准则 | 玛修·基列莱特">
+<meta name="twitter:title" content="ss-redir+iptables+ipset+dnsmasq 配置记录 | 玛修·基列莱特">
 <meta name="twitter:description" content="先輩最低です">
 <meta name="twitter:image" content="https://blog.fiepi.com/assets/img/logo.png">
 <meta property="og:type" content="blog">
 <meta property="og:url" content="https://blog.fiepi.com">
-<meta property="og:title" content="博客评论准则 | 玛修·基列莱特">
+<meta property="og:title" content="ss-redir+iptables+ipset+dnsmasq 配置记录 | 玛修·基列莱特">
 <meta property="og:description" content="先輩最低です">
 <meta property="og:image" content="https://blog.fiepi.com/assets/img/logo.png">
-<title>博客评论准则 | 玛修·基列莱特</title>
-<link rel="canonical" href="https://blog.fiepi.com/policy">
-<link type="application/xml" rel="sitemap" href="https://blog.fiepi.com/sitemap.xml" title="博客评论准则 | 玛修·基列莱特"/>
+<title>ss-redir+iptables+ipset+dnsmasq 配置记录 | 玛修·基列莱特</title>
+<link rel="canonical" href="https://blog.fiepi.com/archlinux/ss-redir_iptables_ipset_dnsmasq.html">
+<link type="application/xml" rel="sitemap" href="https://blog.fiepi.com/sitemap.xml" title="ss-redir+iptables+ipset+dnsmasq 配置记录 | 玛修·基列莱特"/>
 <link type="application/atom+xml" rel="alternate" href="https://blog.fiepi.com/atom.xml" title="玛修·基列莱特" />
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Fira+Mono|Material+Icons|Quicksand">
@@ -120,53 +120,192 @@
         <article>
           <div class="card">
             
+            <div class="card-image">
+              <img class="materialboxed" data-caption="© Atha（アサ）" src="https://i.pximg.net/img-original/img/2017/05/26/00/08/46/63069665_p0.png">
+              <span class="card-title" style="background-color: rgba(0,0,0,.3); width: 100%;">ss-redir+iptables+ipset+dnsmasq 配置记录</span>
+            </div>
+            
             <div class="card-content">
               
-              <span class="card-title">博客评论准则</span>
-              
-              <p style="font-weight: 600; margin-bottom: 10px;"><time datetime="">2017-11-04</time> | <a href="https://blog.fiepi.com/policy#disqus_thread" data-disqus-identifier="">评论</a></p>
+              <p style="font-weight: 600; margin-bottom: 10px;"><time datetime="">2017-11-05</time> | <a href="https://blog.fiepi.com/archlinux/ss-redir_iptables_ipset_dnsmasq.html#disqus_thread" data-disqus-identifier="/archlinux/ss-redir_iptables_ipset_dnsmasq">评论</a></p>
               <div id="post-content">
-                <p>博客是我们能够坦诚的交谈、对话的平台。但坦诚并不一定意味着文明的缺失。我们提出这个博客行为守则希望有助于创造一种风气，来同时鼓励个人的表达和建设性的对话。</p>
+                <p>记录 ss-redir 透明代理配置过程。
+<!-- more --></p>
 
-<!-- more -->
+<h2 id="相关软件包">相关软件包</h2>
 
-<h2 id="1-评论者为自己的观点和语言负责">1. 评论者为自己的观点和语言负责。</h2>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dnsmasq ipset shadowsocks-libev
+</code></pre></div></div>
 
-<p>文明评论，不发表包含以下内容或其他违反法律、人类道德的内容：</p>
+<h2 id="ss-redir-配置">ss-redir 配置</h2>
 
-<p>1) 辱骂、骚扰、恐吓或威胁他人；</p>
+<p>创建配置文件</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo vim /etc/shadowsocks/ss-redir.json
+{
+	"server": "[server_ip]",
+	"server_port": [server_port],
+	"local_port": 10800,
+	"local_address": "127.0.0.1",
+	"password": "password",
+	"timeout": 300,
+	"method": "aes-256-gcm"
+}
+</code></pre></div></div>
+<p>systemd 守护进程</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo vim /etc/systemd/system/ss-redir.service
 
-<p>2) 中伤、欺骗、人身攻击、歪曲他人；</p>
+[Unit]
+Description=Shadowsocks-Libev Client Service Redir Mode
+After=network.target
 
-<p>3) 侵犯版权或商标；</p>
+[Service]
+Type=simple
+User=nobody
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+ExecStart=/usr/bin/ss-redir -c /etc/shadowsocks/ss-redir.json -u
 
-<p>4) 违反了保密义务；</p>
+[Install]
+WantedBy=multi-user.target
 
-<p>5) 违反了他人隐私。</p>
+</code></pre></div></div>
+<p>保持自启动</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo systemctl start ss-redir.service
+sudo systemctl enable ss-redir.service
+</code></pre></div></div>
 
-<p>本站保留根据具体情况来定义和判断什么评论违反上述规则的权利，定义也不局限在上面这个列表。如果删除了一条评论或链接会给出解释。（保留在没有通知的情况下改变这个标准的权利。）</p>
+<h2 id="iptables--ipset-实现-chnroute-分流">iptables + ipset 实现 chnroute 分流</h2>
 
-<h2 id="2-现实生活中我们不会讲的话在网上我们也不会讲">2. 现实生活中我们不会讲的话在网上我们也不会讲。</h2>
+<p>获取中国 IP</p>
 
-<h2 id="3-我们在公开回应之前首先私下接触一下以交换意见">3. 我们在公开回应之前首先私下接触一下以交换意见。</h2>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' &gt; /etc/chnroute.txt
 
-<p>当我们在博客圈子里遇到冲突或者误传，我们会尽一切努力在公开发表任何关于此事的言论之前直接和相关的人（或者找到一个调解人）来做私人间的对话。</p>
+</code></pre></div></div>
+<p>停用默认防火墙自启动服务</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo systemctl disable iptables.service
+</code></pre></div></div>
+<p>新建启动脚本</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo vim /etc/iptables/ss-up.sh
 
-<h2 id="4-当我们确信某人不公平地攻击他人时我们会行动起来">4. 当我们确信某人不公平地攻击他人时，我们会行动起来。</h2>
+#!/bin/bash
 
-<p>当有人发表攻击性的评论或博客文章时，我们会提醒他们(私下场合，如果可能，请参见上面第三点)，并且要求他们公开做出道歉。</p>
+ipset -N chnroute hash:net maxelem 65536
 
-<p>如果这些所发表的言论可以被认为是一种威胁，而且行为人不收回并做出道歉，我们将与法律机构合作以保护受到威胁的对象。</p>
+for ip in $(cat '/etc/chnroute.txt'); do
+  ipset add chnroute $ip
+done
 
-<p>要求博客评论者提供一个有效的电子邮件地址才可以发布他的内容，当然允许评论者使用一个别名而不是真实姓名。</p>
+iptables -t nat -N SHADOWSOCKS
 
-<h2 id="5-不理睬挑衅">5. 不理睬挑衅。</h2>
+# 直连服务器 IP
+iptables -t nat -A SHADOWSOCKS -d [server_ip]/24 -j RETURN
+
+# 允许连接保留地址
+iptables -t nat -A SHADOWSOCKS -d 0.0.0.0/8 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 10.0.0.0/8 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 127.0.0.0/8 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 169.254.0.0/16 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 172.16.0.0/12 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 192.168.0.0/16 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 224.0.0.0/4 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 240.0.0.0/4 -j RETURN
+
+# 直连中国 IP
+iptables -t nat -A SHADOWSOCKS -p tcp -m set --match-set chnroute dst -j RETURN
+iptables -t nat -A SHADOWSOCKS -p icmp -m set --match-set chnroute dst -j RETURN
+
+# 重定向到 ss-redir 端口
+iptables -t nat -A SHADOWSOCKS -p tcp -j REDIRECT --to-port 10800
+iptables -t nat -A SHADOWSOCKS -p udp -j REDIRECT --to-port 10800
+iptables -t nat -A OUTPUT -p tcp -j SHADOWSOCKS
+</code></pre></div></div>
+<p>测试执行情况</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo chmod +x /etc/iptables/ss-up.sh
+sudo sh /etc/iptables/ss-up.sh
+</code></pre></div></div>
+<p>停止脚本</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo vim /etc/iptables/ss-down.sh
+sudo chmod +x /etc/iptables/ss-down.sh
+
+#!/bin/bash
+iptables -t nat -D OUTPUT -p icmp -j SHADOWSOCKS
+iptables -t nat -D OUTPUT -p tcp -j SHADOWSOCKS
+iptables -t nat -F SHADOWSOCKS
+iptables -t nat -X SHADOWSOCKS
+ipset destroy chnroute
+</code></pre></div></div>
+
+<p>添加自启动
+复制修改原 iptables 的 systemd 配置</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo cp /usr/lib/systemd/system/iptables.service /etc/systemd/system/iptables-proxy.service
+</code></pre></div></div>
+<p>根据情况修改，参考如下</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo vim /etc/systemd/system/iptables-proxy.service
+
+[Unit]
+Description=Packet Filtering Framework and Shadowsocks-chnroute
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/etc/iptables/ss-up.sh
+ExecStop=/etc/iptables/ss-down.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+</code></pre></div></div>
+
+<p>检查并添加自启动</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo systemctl daemon-reload
+sudo systemctl start iptables-proxy.service
+sudo systemctl status iptables-proxy.service
+sudo systemctl enable iptables-proxy.service
+</code></pre></div></div>
+
+<h2 id="dnsmasq-的配置">dnsmasq 的配置</h2>
+<p>Dnsmasq 提供 DNS 缓存和 DHCP 服务功能，通过缓存 DNS 请求来提高对访问过的网址的连接速度。</p>
+
+<p>去掉 这几行的配置</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo vim /etc/dnsmasq.conf
+
+resolv-file=/etc/resolv.dnsmasq.conf
+listen-address=127.0.0.1
+</code></pre></div></div>
+<p>修改 Dnsmasq DNS</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo vim /etc/resolv.dnsmasq.conf 
+
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+</code></pre></div></div>
+<p>修改系统 DNS</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo vim /etc/resolv.conf
+nameserver 127.0.0.1
+</code></pre></div></div>
+<p>防止被修改</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo chattr +i /etc/resolv.conf
+</code></pre></div></div>
+<p>更多细节请浏览 <a href="https://wiki.archlinux.org/index.php/dnsmasq"> Dnsmasq - Arch Wiki</a></p>
+
+<p>启动 Dnsmasq</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo systemctl start dnsmasq.service
+sudo systemctl status dnsmasq.service
+sudo systemctl enable dnsmasq.service
+</code></pre></div></div>
 
               </div>
               
               <div class="divider" style="margin: 16px 0;"></div>
               
-                <div class="chip">评论准则</div>
+                <div class="chip">ss-redir</div>
+              
+                <div class="chip">iptables</div>
+              
+                <div class="chip">archlinux</div>
+              
+                <div class="chip">ipset</div>
+              
+                <div class="chip">dnsmasq</div>
               
             </div>
           </div>
@@ -186,8 +325,8 @@
    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
    */
   var disqus_config = function () {
-    this.page.url = "https://blog.fiepi.com/policy";
-    this.page.identifier = "";
+    this.page.url = "https://blog.fiepi.com/archlinux/ss-redir_iptables_ipset_dnsmasq.html";
+    this.page.identifier = "/archlinux/ss-redir_iptables_ipset_dnsmasq";
   };
   (function() { // DON'T EDIT BELOW THIS LINE
     var d = document, s = d.createElement('script');
@@ -205,6 +344,11 @@
       
       <div class="col s12">
         
+        
+        <div class="right">
+          <span style="color: rgba(0,0,0,.87); margin-right: 8px;">上一篇</span>
+          <a class="btn-floating waves-effect waves-light white" href="https://blog.fiepi.com/archlinux/aria2_config.html"><i class="material-icons" style="color: rgba(0,0,0,.87);">arrow_forward</i></a>
+        </div>
         
       </div>
     </div>

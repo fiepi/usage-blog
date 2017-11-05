@@ -1,4 +1,166 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://blog.fiepi.com/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.fiepi.com/" rel="alternate" type="text/html" /><updated>2017-11-05T08:15:22+08:00</updated><id>https://blog.fiepi.com/</id><title type="html">玛修·基列莱特</title><subtitle>先輩最低です</subtitle><author><name>Mash Kyrielight</name><email>fiepi.dev@gamil.com</email></author><entry><title type="html">记录 archlinux 下 aria2+https 的配置过程</title><link href="https://blog.fiepi.com/aria2-config.html" rel="alternate" type="text/html" title="记录 archlinux 下 aria2+https 的配置过程" /><published>2017-11-04T00:00:00+08:00</published><updated>2017-11-04T00:00:00+08:00</updated><id>https://blog.fiepi.com/aria2-config</id><content type="html" xml:base="https://blog.fiepi.com/aria2-config.html">&lt;p&gt;Aria2 是一个轻量的多协议、多线程下载器。这里记录一下安装配置过程。&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://blog.fiepi.com/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.fiepi.com/" rel="alternate" type="text/html" /><updated>2017-11-05T17:58:13+08:00</updated><id>https://blog.fiepi.com/</id><title type="html">玛修·基列莱特</title><subtitle>先輩最低です</subtitle><author><name>Mash Kyrielight</name><email>fiepi.dev@gamil.com</email></author><entry><title type="html">ss-redir+iptables+ipset+dnsmasq 配置记录</title><link href="https://blog.fiepi.com/archlinux/ss-redir_iptables_ipset_dnsmasq.html" rel="alternate" type="text/html" title="ss-redir+iptables+ipset+dnsmasq 配置记录" /><published>2017-11-05T00:00:00+08:00</published><updated>2017-11-05T00:00:00+08:00</updated><id>https://blog.fiepi.com/archlinux/ss-redir_iptables_ipset_dnsmasq</id><content type="html" xml:base="https://blog.fiepi.com/archlinux/ss-redir_iptables_ipset_dnsmasq.html">&lt;p&gt;记录 ss-redir 透明代理配置过程。
+&lt;!-- more --&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;相关软件包&quot;&gt;相关软件包&lt;/h2&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;dnsmasq ipset shadowsocks-libev
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;ss-redir-配置&quot;&gt;ss-redir 配置&lt;/h2&gt;
+
+&lt;p&gt;创建配置文件&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/shadowsocks/ss-redir.json
+{
+	&quot;server&quot;: &quot;[server_ip]&quot;,
+	&quot;server_port&quot;: [server_port],
+	&quot;local_port&quot;: 10800,
+	&quot;local_address&quot;: &quot;127.0.0.1&quot;,
+	&quot;password&quot;: &quot;password&quot;,
+	&quot;timeout&quot;: 300,
+	&quot;method&quot;: &quot;aes-256-gcm&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;systemd 守护进程&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/systemd/system/ss-redir.service
+
+[Unit]
+Description=Shadowsocks-Libev Client Service Redir Mode
+After=network.target
+
+[Service]
+Type=simple
+User=nobody
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+ExecStart=/usr/bin/ss-redir -c /etc/shadowsocks/ss-redir.json -u
+
+[Install]
+WantedBy=multi-user.target
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;保持自启动&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl start ss-redir.service
+sudo systemctl enable ss-redir.service
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;iptables--ipset-实现-chnroute-分流&quot;&gt;iptables + ipset 实现 chnroute 分流&lt;/h2&gt;
+
+&lt;p&gt;获取中国 IP&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf(&quot;%s/%d\n&quot;, $4, 32-log($5)/log(2)) }' &amp;gt; /etc/chnroute.txt
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;停用默认防火墙自启动服务&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl disable iptables.service
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;新建启动脚本&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/iptables/ss-up.sh
+
+#!/bin/bash
+
+ipset -N chnroute hash:net maxelem 65536
+
+for ip in $(cat '/etc/chnroute.txt'); do
+  ipset add chnroute $ip
+done
+
+iptables -t nat -N SHADOWSOCKS
+
+# 直连服务器 IP
+iptables -t nat -A SHADOWSOCKS -d [server_ip]/24 -j RETURN
+
+# 允许连接保留地址
+iptables -t nat -A SHADOWSOCKS -d 0.0.0.0/8 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 10.0.0.0/8 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 127.0.0.0/8 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 169.254.0.0/16 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 172.16.0.0/12 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 192.168.0.0/16 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 224.0.0.0/4 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 240.0.0.0/4 -j RETURN
+
+# 直连中国 IP
+iptables -t nat -A SHADOWSOCKS -p tcp -m set --match-set chnroute dst -j RETURN
+iptables -t nat -A SHADOWSOCKS -p icmp -m set --match-set chnroute dst -j RETURN
+
+# 重定向到 ss-redir 端口
+iptables -t nat -A SHADOWSOCKS -p tcp -j REDIRECT --to-port 10800
+iptables -t nat -A SHADOWSOCKS -p udp -j REDIRECT --to-port 10800
+iptables -t nat -A OUTPUT -p tcp -j SHADOWSOCKS
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;测试执行情况&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo chmod +x /etc/iptables/ss-up.sh
+sudo sh /etc/iptables/ss-up.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;停止脚本&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/iptables/ss-down.sh
+sudo chmod +x /etc/iptables/ss-down.sh
+
+#!/bin/bash
+iptables -t nat -D OUTPUT -p icmp -j SHADOWSOCKS
+iptables -t nat -D OUTPUT -p tcp -j SHADOWSOCKS
+iptables -t nat -F SHADOWSOCKS
+iptables -t nat -X SHADOWSOCKS
+ipset destroy chnroute
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;添加自启动
+复制修改原 iptables 的 systemd 配置&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo cp /usr/lib/systemd/system/iptables.service /etc/systemd/system/iptables-proxy.service
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;根据情况修改，参考如下&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/systemd/system/iptables-proxy.service
+
+[Unit]
+Description=Packet Filtering Framework and Shadowsocks-chnroute
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/etc/iptables/ss-up.sh
+ExecStop=/etc/iptables/ss-down.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;检查并添加自启动&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl daemon-reload
+sudo systemctl start iptables-proxy.service
+sudo systemctl status iptables-proxy.service
+sudo systemctl enable iptables-proxy.service
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;dnsmasq-的配置&quot;&gt;dnsmasq 的配置&lt;/h2&gt;
+&lt;p&gt;Dnsmasq 提供 DNS 缓存和 DHCP 服务功能，通过缓存 DNS 请求来提高对访问过的网址的连接速度。&lt;/p&gt;
+
+&lt;p&gt;去掉 这几行的配置&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/dnsmasq.conf
+
+resolv-file=/etc/resolv.dnsmasq.conf
+listen-address=127.0.0.1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;修改 Dnsmasq DNS&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/resolv.dnsmasq.conf 
+
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;修改系统 DNS&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/resolv.conf
+nameserver 127.0.0.1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;防止被修改&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo chattr +i /etc/resolv.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;更多细节请浏览 &lt;a href=&quot;https://wiki.archlinux.org/index.php/dnsmasq&quot;&gt; Dnsmasq - Arch Wiki&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;启动 Dnsmasq&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl start dnsmasq.service
+sudo systemctl status dnsmasq.service
+sudo systemctl enable dnsmasq.service
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>fiepi</name></author><category term="archlinux" /><category term="ss-redir" /><category term="iptables" /><category term="archlinux" /><category term="ipset" /><category term="dnsmasq" /><summary type="html">记录 ss-redir 透明代理配置过程。</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://i.pximg.net/img-original/img/2017/05/26/00/08/46/63069665_p0.png" /></entry><entry><title type="html">记录 archlinux 下 aria2+https 的配置过程</title><link href="https://blog.fiepi.com/archlinux/aria2_config.html" rel="alternate" type="text/html" title="记录 archlinux 下 aria2+https 的配置过程" /><published>2017-11-04T00:00:00+08:00</published><updated>2017-11-04T00:00:00+08:00</updated><id>https://blog.fiepi.com/archlinux/aria2_config</id><content type="html" xml:base="https://blog.fiepi.com/archlinux/aria2_config.html">&lt;p&gt;Aria2 是一个轻量的多协议、多线程下载器。这里记录一下安装配置过程。&lt;/p&gt;
 
 &lt;!-- more --&gt;
 
