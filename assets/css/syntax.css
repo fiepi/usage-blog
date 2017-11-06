@@ -1,4 +1,4 @@
-.highlight table td { padding: 5px; }
+.highlight table td { padding: 0; }
 .highlight table pre { margin: 0; }
 .highlight .cm {
   color: #999988;
@@ -205,5 +205,5 @@
   color: #bbbbbb;
 }
 .highlight {
-  background-color: #f8f8f8;
+  background-color: #f1f1f1;
 }
