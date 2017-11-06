@@ -135,11 +135,11 @@
                 <p>记录 ss-redir 透明代理配置过程。
 <!-- more --></p>
 
-<h2 id="-相关软件包"># 相关软件包</h2>
+<h2 id="--相关软件包">#  相关软件包</h2>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo </span>pacman <span class="nt">-S</span> dnsmasq ipset shadowsocks-libev</code></pre></figure>
 
-<h2 id="-ss-redir-配置"># ss-redir 配置</h2>
+<h2 id="--ss-redir-配置">#  ss-redir 配置</h2>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># 创建配置文件</span>
 <span class="nb">sudo </span>vim /etc/shadowsocks/ss-redir.json</code></pre></figure>
@@ -174,7 +174,7 @@
 <span class="nb">sudo </span>systemctl start ss-redir.service
 <span class="nb">sudo </span>systemctl <span class="nb">enable </span>ss-redir.service</code></pre></figure>
 
-<h2 id="-iptables--ipset-实现-chnroute-分流"># iptables + ipset 实现 chnroute 分流</h2>
+<h2 id="--iptables--ipset-实现-chnroute-分流">#  iptables + ipset 实现 chnroute 分流</h2>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># 获取中国 IP</span>
 su
@@ -251,13 +251,13 @@ ipset destroy chnroute</code></pre></figure>
 [<span class="n">Install</span>]
 <span class="n">WantedBy</span>=<span class="n">multi</span>-<span class="n">user</span>.<span class="n">target</span></code></pre></figure>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c">#检查并添加自启动</span>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># 检查并添加自启动</span>
 <span class="nb">sudo </span>systemctl daemon-reload
 <span class="nb">sudo </span>systemctl start iptables-proxy.service
 <span class="nb">sudo </span>systemctl status iptables-proxy.service
 <span class="nb">sudo </span>systemctl <span class="nb">enable </span>iptables-proxy.service</code></pre></figure>
 
-<h2 id="-dnsmasq-的配置"># dnsmasq 的配置</h2>
+<h2 id="--dnsmasq-的配置">#  dnsmasq 的配置</h2>
 <p>Dnsmasq 提供 DNS 缓存和 DHCP 服务功能，通过缓存 DNS 请求来提高对访问过的网址的连接速度。</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo </span>vim /etc/dnsmasq.conf</code></pre></figure>
@@ -392,7 +392,7 @@ ipset destroy chnroute</code></pre></figure>
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/materialize.min.js"></script>
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/prism.min.js"></script>
 <script type="text/javascript">
-  var now = new Date('2017-11-06 13:28:31 +0800').getTime();
+  var now = new Date('2017-11-06 13:51:46 +0800').getTime();
   $(document).ready(function () {
     $('.button-collapse').sideNav();
     $('.collapsible').collapsible();

@@ -135,206 +135,147 @@
 
 <h1 id="1-安装">1. 安装</h1>
 
-<blockquote>
-  <p>sudo pacman -S aria2 certbot nginx</p>
-</blockquote>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo </span>pacman <span class="nt">-S</span> aria2 certbot nginx</code></pre></figure>
 
 <h1 id="2-配置">2. 配置</h1>
 
-<p>假设下载服务器域名为：</p>
+<p>假设下载服务器域名为：aria2.fiepi.com</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aria2.fiepi.com
-</code></pre></div></div>
+<h2 id="--配置临时-web-服务器获取免费-lets-encrypt-证书">#  配置临时 web 服务器获取免费 Let’s Encrypt 证书</h2>
 
-<h2 id="1-配置临时-web-服务器获取免费-lets-encrypt-证书">（1） 配置临时 web 服务器获取免费 Let’s Encrypt 证书</h2>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo </span>vim /etc/nginx/nginx.conf
+<span class="c"># 添加到 http 内</span>
+include vhost/<span class="k">*</span>.conf<span class="p">;</span></code></pre></figure>
 
-<p>添加</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># 创建 nginx 配置文件</span>
+<span class="nb">sudo </span>mkdir /etc/nginx/vhost
+<span class="nb">sudo </span>vim /etc/nginx/vhost/aria2.fiepi.com.conf</code></pre></figure>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>include vhost/*.conf;
-</code></pre></div></div>
-
-<p>到</p>
-
-<blockquote>
-  <p>/etc/nginx/nginx.conf</p>
-</blockquote>
-
-<p>创建 nginx 配置文件</p>
-
-<blockquote>
-  <p>sudo mkdir /etc/nginx/vhost</p>
-</blockquote>
-
-<blockquote>
-  <p>sudo vim /etc/nginx/vhost/aria2.fiepi.com.conf</p>
-</blockquote>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>server {
-    listen 80;
-    server_name aria2.fiepi.com;
-    index index.html index.htm;
-    root /home/fiepi/web/root;
-    autoindex on;
-    autoindex_exact_size off;
-    autoindex_localtime on;
-    location / {
+<figure class="highlight"><pre><code class="language-conf" data-lang="conf"><span class="n">server</span> {
+    <span class="n">listen</span> <span class="m">80</span>;
+    <span class="n">server_name</span> <span class="n">aria2</span>.<span class="n">fiepi</span>.<span class="n">com</span>;
+    <span class="n">index</span> <span class="n">index</span>.<span class="n">html</span> <span class="n">index</span>.<span class="n">htm</span>;
+    <span class="n">root</span> /<span class="n">home</span>/<span class="n">fiepi</span>/<span class="n">web</span>/<span class="n">root</span>;
+    <span class="n">autoindex</span> <span class="n">on</span>;
+    <span class="n">autoindex_exact_size</span> <span class="n">off</span>;
+    <span class="n">autoindex_localtime</span> <span class="n">on</span>;
+    <span class="n">location</span> / {
     }
-    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|flv|ico)$ {
-        expires 30d;
-        access_log off;
+    <span class="n">location</span> ~ .*\.(<span class="n">gif</span>|<span class="n">jpg</span>|<span class="n">jpeg</span>|<span class="n">png</span>|<span class="n">bmp</span>|<span class="n">swf</span>|<span class="n">flv</span>|<span class="n">ico</span>)$ {
+        <span class="n">expires</span> <span class="m">30</span><span class="n">d</span>;
+        <span class="n">access_log</span> <span class="n">off</span>;
     }
-    location ~ .*\.(js|css)?$ {
-        expires 7d;
-        access_log off;
+    <span class="n">location</span> ~ .*\.(<span class="n">js</span>|<span class="n">css</span>)?$ {
+        <span class="n">expires</span> <span class="m">7</span><span class="n">d</span>;
+        <span class="n">access_log</span> <span class="n">off</span>;
     }
-}
-</code></pre></div></div>
+}</code></pre></figure>
 
-<p>测试配置无误后重启 nginx 并生成证书</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># 测试配置无误后重启 nginx 并生成证书</span>
+<span class="nb">sudo </span>nginx <span class="nt">-t</span>
+<span class="nb">sudo </span>systemctl restart nginx.service
+<span class="nb">sudo </span>certbot certonly <span class="nt">--webroot</span> <span class="nt">-w</span> /home/fiepi/web/root <span class="nt">-d</span> aria2.fiepi.com</code></pre></figure>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo nginx -t
+<p>证书路径：/etc/letsencrypt/archive/aria2.fiepi.com</p>
 
-sudo systemctl restart nginx.service
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"> <span class="c"># 修改权限让 aria2 能够读取</span>
+<span class="nb">sudo </span>chown <span class="nt">-R</span> fiepi:users /etc/letsencrypt/archive
 
-sudo certbot certonly --webroot -w /home/fiepi/web/root -d aria2.fiepi.com
+<span class="c">#移除临时 web 配置</span>
+<span class="nb">sudo </span>mv /etc/nginx/vhost/aria2.fiepi.com.conf /etc/nginx/vhost/aria2.fiepi.com.conf.bak
+<span class="nb">sudo </span>systemctl restart nginx.service</code></pre></figure>
 
-</code></pre></div></div>
-<p>证书路径：</p>
+<h2 id="--创建-aria2-配置">#  创建 aria2 配置</h2>
 
-<blockquote>
-  <p>/etc/letsencrypt/archive/aria2.fiepi.com/</p>
-</blockquote>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># 随机生成身份认证的 Token：</span>
+openssl rand <span class="nt">-hex</span> 15
+<span class="c"># 路径</span>
+mkdir <span class="nt">-p</span> ~/.config/aria2
+vim ~/.config/aria2/aria2.conf</code></pre></figure>
 
-<p>修改权限让 aria2 能够读取</p>
-
-<blockquote>
-  <p>sudo chown -R fiepi:users /etc/letsencrypt/archive</p>
-</blockquote>
-
-<p>移除临时 web 配置</p>
-
-<blockquote>
-  <p>sudo mv /etc/nginx/vhost/aria2.fiepi.com.conf /etc/nginx/vhost/aria2.fiepi.com.conf.bak</p>
-</blockquote>
-
-<blockquote>
-  <p>sudo systemctl restart nginx.service</p>
-</blockquote>
-
-<h2 id="2创建-aria2-配置">（2）创建 aria2 配置</h2>
-
-<blockquote>
-  <p>mkdir -p ~/.config/aria2</p>
-</blockquote>
-
-<blockquote>
-  <p>vim ~/.config/aria2/aria2.conf</p>
-</blockquote>
-
-<p>随机生成身份认证的 Token：</p>
-
-<blockquote>
-  <p>openssl rand -hex 15</p>
-</blockquote>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 下载路径
-dir=~/Downloads/aria2
-## 生成随机 Token: openssl rand -hex 15
-rpc-secret=xxxxxx
-rpc-secure=true
-## 证书
-rpc-certificate=/etc/letsencrypt/archive/aria2.fiepi.com/fullchain1.pem
-rpc-private-key=/etc/letsencrypt/archive/aria2.fiepi.com/privkey1.pem
-## http代理
+<figure class="highlight"><pre><code class="language-conf" data-lang="conf"><span class="c">## 下载路径
+</span><span class="n">dir</span>=~/<span class="n">Downloads</span>/<span class="n">aria2</span>
+<span class="c">## 生成随机 Token: openssl rand -hex 15
+</span><span class="n">rpc</span>-<span class="n">secret</span>=<span class="n">xxxxxx</span>
+<span class="n">rpc</span>-<span class="n">secure</span>=<span class="n">true</span>
+<span class="c">## 证书
+</span><span class="n">rpc</span>-<span class="n">certificate</span>=/<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">archive</span>/<span class="n">aria2</span>.<span class="n">fiepi</span>.<span class="n">com</span>/<span class="n">fullchain1</span>.<span class="n">pem</span>
+<span class="n">rpc</span>-<span class="n">private</span>-<span class="n">key</span>=/<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">archive</span>/<span class="n">aria2</span>.<span class="n">fiepi</span>.<span class="n">com</span>/<span class="n">privkey1</span>.<span class="n">pem</span>
+<span class="c">## http代理
 # http-proxy=http://127.0.0.1:8118
 ## 上传速度限制 0 为不限制
-max-overall-upload-limit=10K
-max-upload-limit=2K
-## 是否预先分配磁盘空间
-file-allocation=prealloc
-## 是否继续下载未完成的文件
-continue=true
-## 日志级别，可以为debug, info, notice, warn 或 error
-log-level=info
-## 每下载任务最大连接数
-max-connection-per-server=10
-## 下载进度输出的间隔时间
+</span><span class="n">max</span>-<span class="n">overall</span>-<span class="n">upload</span>-<span class="n">limit</span>=<span class="m">10</span><span class="n">K</span>
+<span class="n">max</span>-<span class="n">upload</span>-<span class="n">limit</span>=<span class="m">2</span><span class="n">K</span>
+<span class="c">## 是否预先分配磁盘空间
+</span><span class="n">file</span>-<span class="n">allocation</span>=<span class="n">prealloc</span>
+<span class="c">## 是否继续下载未完成的文件
+</span><span class="n">continue</span>=<span class="n">true</span>
+<span class="c">## 日志级别，可以为debug, info, notice, warn 或 error
+</span><span class="n">log</span>-<span class="n">level</span>=<span class="n">info</span>
+<span class="c">## 每下载任务最大连接数
+</span><span class="n">max</span>-<span class="n">connection</span>-<span class="n">per</span>-<span class="n">server</span>=<span class="m">10</span>
+<span class="c">## 下载进度输出的间隔时间
 #summary-interval=120
 ## 是否以进程的方式启动
-daemon=true
-## 是否启用rpc
-enable-rpc=true
-## rpc监听端口
-rpc-listen-port=6800
-## 是否在所有网卡上启用监听
-rpc-listen-all=true
-## 最大同时下载任务数，根据实际情况修改
+</span><span class="n">daemon</span>=<span class="n">true</span>
+<span class="c">## 是否启用rpc
+</span><span class="n">enable</span>-<span class="n">rpc</span>=<span class="n">true</span>
+<span class="c">## rpc监听端口
+</span><span class="n">rpc</span>-<span class="n">listen</span>-<span class="n">port</span>=<span class="m">6800</span>
+<span class="c">## 是否在所有网卡上启用监听
+</span><span class="n">rpc</span>-<span class="n">listen</span>-<span class="n">all</span>=<span class="n">true</span>
+<span class="c">## 最大同时下载任务数，根据实际情况修改
 #max-concurrent-downloads=3
 ## 会话保存文件，进程退出时保存未下载完成的会话
-save-session=/home/fiepi/.config/aria2/session.lock
-## 启动输入文件，进程启动时读取上次未下载完成的会话
-input-file=/home/fiepi/.config/aria2/session.lock
-## 日志文件，根据实际情况修改
+</span><span class="n">save</span>-<span class="n">session</span>=/<span class="n">home</span>/<span class="n">fiepi</span>/.<span class="n">config</span>/<span class="n">aria2</span>/<span class="n">session</span>.<span class="n">lock</span>
+<span class="c">## 启动输入文件，进程启动时读取上次未下载完成的会话
+</span><span class="n">input</span>-<span class="n">file</span>=/<span class="n">home</span>/<span class="n">fiepi</span>/.<span class="n">config</span>/<span class="n">aria2</span>/<span class="n">session</span>.<span class="n">lock</span>
+<span class="c">## 日志文件，根据实际情况修改
 #log=~/.config/aria2/aria.log
 ## 是否关闭ipv6
-disable-ipv6=true
-## 磁盘缓存
-disk-cache=0
-## 超时时间
+</span><span class="n">disable</span>-<span class="n">ipv6</span>=<span class="n">true</span>
+<span class="c">## 磁盘缓存
+</span><span class="n">disk</span>-<span class="n">cache</span>=<span class="m">0</span>
+<span class="c">## 超时时间
 #timeout=600
 ## 重试等待时间
 #retry-wait=30
 ## 最大重试次数，0代表可以无限次重试
 #max-tries=0
 ## user agent，此处所填值用于伪装成百度云网盘客户端
-user-agent=netdisk;4.4.0.6;PC;PC-Windows;6.2.9200 WindowsBaiduYunGuanJia
-</code></pre></div></div>
+</span><span class="n">user</span>-<span class="n">agent</span>=<span class="n">netdisk</span>;<span class="m">4</span>.<span class="m">4</span>.<span class="m">0</span>.<span class="m">6</span>;<span class="n">PC</span>;<span class="n">PC</span>-<span class="n">Windows</span>;<span class="m">6</span>.<span class="m">2</span>.<span class="m">9200</span> <span class="n">WindowsBaiduYunGuanJia</span></code></pre></figure>
 
-<h2 id="3创建-systemd-守护进程">（3）创建 systemd 守护进程</h2>
+<h2 id="--创建-systemd-守护进程">#  创建 systemd 守护进程</h2>
 
-<blockquote>
-  <p>sudo vim /etc/systemd/user/aria2.service</p>
-</blockquote>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo </span>vim /etc/systemd/user/aria2.service</code></pre></figure>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Unit]
-Description=Aria2 Service
-After=network.target
+<figure class="highlight"><pre><code class="language-conf" data-lang="conf">[<span class="n">Unit</span>]
+<span class="n">Description</span>=<span class="n">Aria2</span> <span class="n">Service</span>
+<span class="n">After</span>=<span class="n">network</span>.<span class="n">target</span>
 
-[Service]
-Type=forking
-WorkingDirectory=%h
-ExecStart=/usr/bin/aria2c --daemon --enable-rpc --rpc-listen-all --rpc-allow-origin-all -c -D  --conf-path=%h/.config/aria2/aria2.conf
+[<span class="n">Service</span>]
+<span class="n">Type</span>=<span class="n">forking</span>
+<span class="n">WorkingDirectory</span>=%<span class="n">h</span>
+<span class="n">ExecStart</span>=/<span class="n">usr</span>/<span class="n">bin</span>/<span class="n">aria2c</span> --<span class="n">daemon</span> --<span class="n">enable</span>-<span class="n">rpc</span> --<span class="n">rpc</span>-<span class="n">listen</span>-<span class="n">all</span> --<span class="n">rpc</span>-<span class="n">allow</span>-<span class="n">origin</span>-<span class="n">all</span> -<span class="n">c</span> -<span class="n">D</span>  --<span class="n">conf</span>-<span class="n">path</span>=%<span class="n">h</span>/.<span class="n">config</span>/<span class="n">aria2</span>/<span class="n">aria2</span>.<span class="n">conf</span>
 
-[Install]
-WantedBy=default.target
-</code></pre></div></div>
-<p>启动</p>
+[<span class="n">Install</span>]
+<span class="n">WantedBy</span>=<span class="n">default</span>.<span class="n">target</span></code></pre></figure>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl --user start aria2.service
-
-systemctl --user enable aria2.service
-</code></pre></div></div>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># 启动</span>
+systemctl <span class="nt">--user</span> start aria2.service
+systemctl <span class="nt">--user</span> <span class="nb">enable </span>aria2.service</code></pre></figure>
 
 <p>过去用户进程在用户登出时会被杀死，现在 Arch 已经修改了默认编译参数，所以不需要额外的设置。详见  <a href="https://wiki.archlinux.org/index.php/Systemd/User">Arch Wiki Systemd/User</a> 的 <a href="https://wiki.archlinux.org/index.php/Systemd/User#Kill_user_processes_on_logout">Kill user processes on logout</a> 部分。</p>
 
-<h2 id="4防火墙配置">（4）防火墙配置</h2>
+<h2 id="--防火墙配置">#  防火墙配置</h2>
 
-<p>打开 6800 端口</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># 打开 6800 端口</span>
+<span class="nb">sudo </span>vim /etc/iptables/iptables.rules
+<span class="c"># 添加</span>
+<span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">-m</span> tcp <span class="nt">--dport</span> 6800 <span class="nt">-j</span> ACCEPT
 
-<blockquote>
-  <p>sudo vim /etc/iptables/iptables.rules</p>
-</blockquote>
-
-<p>添加</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-A INPUT -p tcp -m tcp --dport 6800 -j ACCEPT
-</code></pre></div></div>
-
-<p>使之生效</p>
-
-<blockquote>
-  <p>sudo iptables-restore &lt; /etc/iptables/iptables.rules</p>
-</blockquote>
+<span class="c">#生效</span>
+<span class="nb">sudo </span>iptables-restore &lt; /etc/iptables/iptables.rules</code></pre></figure>
 
 <p>最后打开 Yaaw（<a href="https://yaaw.fiepi.com">yaaw.fiepi.com</a>） 前端，填入配置：</p>
 
@@ -454,7 +395,7 @@ systemctl --user enable aria2.service
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/materialize.min.js"></script>
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/prism.min.js"></script>
 <script type="text/javascript">
-  var now = new Date('2017-11-06 13:28:31 +0800').getTime();
+  var now = new Date('2017-11-06 13:51:46 +0800').getTime();
   $(document).ready(function () {
     $('.button-collapse').sideNav();
     $('.collapsible').collapsible();
