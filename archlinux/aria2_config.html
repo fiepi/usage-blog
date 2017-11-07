@@ -39,11 +39,10 @@
 </head>
 
 <body>
-  <style type="text/css">
-      nav { background-color: #e91e63; color: #fff; }
-      nav a { color: #fff; }
-      nav ul a { color: #fff; }
-      nav .brand-logo { color: #fff; }
+    <style type="text/css">
+      nav { 
+          background-color: #e91e63; 
+          }
     </style>
   <header>
     <div class="navbar-fixed">
@@ -396,10 +395,21 @@ systemctl <span class="nt">--user</span> <span class="nb">enable </span>aria2.se
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/materialize.min.js"></script>
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/prism.min.js"></script>
 <script type="text/javascript" src="https://blog.fiepi.com/assets/js/headroom.min-0.9.4.js"></script>
-<script type="text/javascript" src="https://blog.fiepi.com/assets/js/jQuery.headroom.js"></script>
-<script type="text/javascript">$(".navbar-fixed").headroom();</script>
+<script>
+(function() {
+  new Headroom(document.querySelector(".navbar-fixed"), {
+    offset : 6,
+    tolerance: 6,
+    classes: {
+      initial: "animated",
+      pinned: "slideUp",
+      unpinned: "slideDown"
+    }
+  }).init();
+}());
+</script>
 <script type="text/javascript">
-  var now = new Date('2017-11-07 20:46:11 +0800').getTime();
+  var now = new Date('2017-11-07 22:11:29 +0800').getTime();
   $(document).ready(function () {
     $('.button-collapse').sideNav();
     $('.collapsible').collapsible();
