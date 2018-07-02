@@ -145,7 +145,7 @@ setMeasuredDimension 方法决定了 View 大小，在 onMeasure 重设 ImageVie
         <span class="n">this</span>.<span class="n">heightWeight</span> = <span class="n">heightWeight</span>
     }
 
-    <span class="n">public</span> <span class="n">override</span> <span class="n">fun</span> <span class="n">onMeasure</span>(<span class="n">widthMeasureSpec</span>: <span class="n">Int</span>, <span class="n">heightMeasureSpec</span>: <span class="n">Int</span>) {
+    <span class="n">override</span> <span class="n">fun</span> <span class="n">onMeasure</span>(<span class="n">widthMeasureSpec</span>: <span class="n">Int</span>, <span class="n">heightMeasureSpec</span>: <span class="n">Int</span>) {
         <span class="n">super</span>.<span class="n">onMeasure</span>(<span class="n">widthMeasureSpec</span>, <span class="n">heightMeasureSpec</span>)
         <span class="n">val</span> <span class="n">width</span> = <span class="n">this</span>.<span class="n">measuredWidth</span>
         <span class="n">val</span> <span class="n">height</span> = <span class="n">width</span> * <span class="n">heightWeight</span> / <span class="n">widthWeight</span>
@@ -266,7 +266,7 @@ setMeasuredDimension 方法决定了 View 大小，在 onMeasure 重设 ImageVie
 }());
 </script>
 <script type="text/javascript">
-  var now = new Date('2018-07-02 22:21:49 +0800').getTime();
+  var now = new Date('2018-07-02 22:50:39 +0800').getTime();
   $(document).ready(function () {
     $('.button-collapse').sideNav();
     $('.collapsible').collapsible();
