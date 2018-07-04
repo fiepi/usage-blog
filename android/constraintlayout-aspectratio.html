@@ -9,22 +9,22 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="description" content="先輩最低です">
 <meta name="keywords" content="Linux, Arch Linux, Android, Blog, and Shadowsocks">
-<meta name="author" content="Archive | 玛修·基列莱特">
+<meta name="author" content="使用 ConstraintLayout 固定 ImageView 寬高比 | 玛修·基列莱特">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#e91e63">
 <meta name="google" content="notranslate">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Archive | 玛修·基列莱特">
+<meta name="twitter:title" content="使用 ConstraintLayout 固定 ImageView 寬高比 | 玛修·基列莱特">
 <meta name="twitter:description" content="先輩最低です">
 <meta name="twitter:image" content="https://blog.fiepi.com/assets/img/logo.png">
 <meta property="og:type" content="blog">
 <meta property="og:url" content="https://blog.fiepi.com">
-<meta property="og:title" content="Archive | 玛修·基列莱特">
+<meta property="og:title" content="使用 ConstraintLayout 固定 ImageView 寬高比 | 玛修·基列莱特">
 <meta property="og:description" content="先輩最低です">
 <meta property="og:image" content="https://blog.fiepi.com/assets/img/logo.png">
-<title>Archive | 玛修·基列莱特</title>
-<link rel="canonical" href="https://blog.fiepi.com/archive.html">
-<link type="application/xml" rel="sitemap" href="https://blog.fiepi.com/sitemap.xml" title="Archive | 玛修·基列莱特"/>
+<title>使用 ConstraintLayout 固定 ImageView 寬高比 | 玛修·基列莱特</title>
+<link rel="canonical" href="https://blog.fiepi.com/android/constraintlayout-aspectratio.html">
+<link type="application/xml" rel="sitemap" href="https://blog.fiepi.com/sitemap.xml" title="使用 ConstraintLayout 固定 ImageView 寬高比 | 玛修·基列莱特"/>
 <link type="application/atom+xml" rel="alternate" href="https://blog.fiepi.com/atom.xml" title="玛修·基列莱特" />
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Fira+Mono|Material+Icons|Quicksand">
@@ -116,38 +116,118 @@
       <div class="col s12">
         <article>
           <div class="card">
+            
             <div class="card-content">
-              <span class="card-title">归档</span>
-              <ul class="collection">
               
-                <li class="collection-item">
-                  <strong><time datetime="2018-07-04 00:00:00 +0800">2018-07-04</time></strong><br>
-                  <a href="https://blog.fiepi.com/android/constraintlayout-aspectratio.html">使用 ConstraintLayout 固定 ImageView 寬高比</a>
-                </li>
+              <span class="card-title">使用 ConstraintLayout 固定 ImageView 寬高比</span>
               
-                <li class="collection-item">
-                  <strong><time datetime="2018-07-02 00:00:00 +0800">2018-07-02</time></strong><br>
-                  <a href="https://blog.fiepi.com/android/fixed-imageview.html">ImageView 固定寬高比</a>
-                </li>
+              <p style="font-weight: 600; margin-bottom: 10px;"><time datetime="">2018-07-04</time> | <a href="https://blog.fiepi.com/android/constraintlayout-aspectratio.html#disqus_thread" data-disqus-identifier="/android/constraintlayout-aspectratio">评论</a></p>
+              <div id="post-content">
+                <p>前一篇动态修改 ImageView 的寬高比，在 RecyclerView 瀑布流加载大量寬高比不同的图片时会出现抖动移位。
+现改用 ConstraintLayout 实现可避免这种情况。
+<!-- more -->
+item 布局，初始比例 1:1</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;android.support.constraint.ConstraintLayout</span>
+    <span class="na">xmlns:android=</span><span class="s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="na">xmlns:app=</span><span class="s">"http://schemas.android.com/apk/res-auto"</span>
+    <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+    <span class="na">android:layout_height=</span><span class="s">"wrap_content"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;ImageView</span>
+        <span class="na">android:id=</span><span class="s">"@+id/post_item"</span>
+        <span class="na">android:scaleType=</span><span class="s">"centerCrop"</span>
+        <span class="na">android:contentDescription=</span><span class="s">"@null"</span>
+        <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+        <span class="na">android:layout_height=</span><span class="s">"0dp"</span>
+        <span class="na">app:layout_constraintDimensionRatio=</span><span class="s">"H, 1:1"</span>
+        <span class="na">app:layout_constraintBottom_toBottomOf=</span><span class="s">"parent"</span>
+        <span class="na">app:layout_constraintTop_toTopOf=</span><span class="s">"parent"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;ImageView</span>
+        <span class="na">android:id=</span><span class="s">"@+id/rate"</span>
+        <span class="na">android:src=</span><span class="s">"@drawable/ic_action_star_border_24dp"</span>
+        <span class="na">android:layout_width=</span><span class="s">"wrap_content"</span>
+        <span class="na">android:layout_height=</span><span class="s">"wrap_content"</span>
+        <span class="na">android:layout_margin=</span><span class="s">"4dp"</span>
+        <span class="na">android:contentDescription=</span><span class="s">"@null"</span>
+        <span class="na">app:layout_constraintRight_toRightOf=</span><span class="s">"parent"</span>
+        <span class="na">app:layout_constraintBottom_toBottomOf=</span><span class="s">"parent"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/android.support.constraint.ConstraintLayout&gt;</span></code></pre></figure>
+
+<p>加载图片前在 onBindViewHolder 方法修改 ImageView 寬高比</p>
+
+<figure class="highlight"><pre><code class="language-kotlin" data-lang="kotlin">	<span class="kd">val</span> <span class="py">lp</span> <span class="p">=</span> <span class="n">holder</span><span class="p">.</span><span class="n">post</span><span class="p">.</span><span class="n">layoutParams</span> <span class="k">as</span> <span class="n">ConstraintLayout</span><span class="p">.</span><span class="n">LayoutParams</span>
+	<span class="n">lp</span><span class="p">.</span><span class="n">dimensionRatio</span> <span class="p">=</span> <span class="s">"H, ${posts[position].actual_preview_width}:${posts[position].actual_preview_height}"</span>
+        <span class="n">holder</span><span class="p">.</span><span class="n">post</span><span class="p">.</span><span class="n">layoutParams</span> <span class="p">=</span> <span class="n">lp</span>
+        <span class="n">GlideApp</span><span class="p">.</span><span class="n">with</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        	<span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">MoeGlideUrl</span><span class="p">(</span><span class="n">posts</span><span class="p">[</span><span class="n">position</span><span class="p">].</span><span class="n">preview_url</span><span class="p">))</span>
+                <span class="p">.</span><span class="n">fitCenter</span><span class="p">()</span>
+                <span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">resources</span><span class="p">.</span><span class="n">getDrawable</span><span class="p">(</span><span class="n">placeHolderId</span><span class="p">,</span> <span class="n">context</span><span class="p">.</span><span class="n">theme</span><span class="p">))</span>
+                <span class="p">.</span><span class="n">into</span><span class="p">(</span><span class="n">holder</span><span class="p">.</span><span class="n">post</span><span class="p">)</span></code></pre></figure>
+
+
+              </div>
               
-                <li class="collection-item">
-                  <strong><time datetime="2017-11-05 00:00:00 +0800">2017-11-05</time></strong><br>
-                  <a href="https://blog.fiepi.com/archlinux/ss-redir_iptables_ipset_dnsmasq.html">ss-redir+iptables+ipset+dnsmasq 配置记录</a>
-                </li>
+              <div class="divider" style="margin: 16px 0;"></div>
               
-                <li class="collection-item">
-                  <strong><time datetime="2017-11-04 00:00:00 +0800">2017-11-04</time></strong><br>
-                  <a href="https://blog.fiepi.com/archlinux/aria2_config.html">记录 archlinux 下 aria2+https 的配置过程</a>
-                </li>
+                <div class="chip">android</div>
               
-              </ul>
+                <div class="chip">imageview</div>
+              
+                <div class="chip">fixed-aspect-ratio</div>
+              
+                <div class="chip">constraintlayout</div>
+              
             </div>
           </div>
         </article>
       </div>
+      
+      <div class="col s12">
+        <article>
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">评论</span>
+              <div id="disqus_thread"></div>
+
+<script>
+  /**
+   *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+   *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+   */
+  var disqus_config = function () {
+    this.page.url = "https://blog.fiepi.com/android/constraintlayout-aspectratio.html";
+    this.page.identifier = "/android/constraintlayout-aspectratio";
+  };
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://fiepi.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+            </div>
+          </div>
+        </article>
+      </div>
+      
+      <div class="col s12">
+        
+        
+        <div class="right">
+          <span style="color: rgba(0,0,0,.87); margin-right: 8px;">上一篇</span>
+          <a class="btn-floating waves-effect waves-light white" href="https://blog.fiepi.com/android/fixed-imageview.html"><i class="material-icons" style="color: rgba(0,0,0,.87);">arrow_forward</i></a>
+        </div>
+        
+      </div>
     </div>
   </div>
 </div>
+
+
+<script id="dsq-count-scr" src="//fiepi.disqus.com/count.js" async></script>
+
 
     </section>
   </main>
