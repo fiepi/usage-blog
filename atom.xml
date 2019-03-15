@@ -1,4 +1,141 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://blog.fiepi.com/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.fiepi.com/" rel="alternate" type="text/html" /><updated>2018-07-20T23:49:57+08:00</updated><id>https://blog.fiepi.com/</id><title type="html">玛修·基列莱特</title><subtitle>先輩最低です</subtitle><author><name>Mash Kyrielight</name><email>im@fiepi.com</email></author><entry><title type="html">Kotlin: tailrec 修饰符优化尾递归</title><link href="https://blog.fiepi.com/kotlin/kotlin-tailrec.html" rel="alternate" type="text/html" title="Kotlin: tailrec 修饰符优化尾递归" /><published>2018-07-20T00:00:00+08:00</published><updated>2018-07-20T00:00:00+08:00</updated><id>https://blog.fiepi.com/kotlin/kotlin-tailrec</id><content type="html" xml:base="https://blog.fiepi.com/kotlin/kotlin-tailrec.html">&lt;p&gt;函数中所有递归形式的调用都出现在函数的末尾的情形称为尾递归。
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://blog.fiepi.com/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.fiepi.com/" rel="alternate" type="text/html" /><updated>2019-03-15T16:32:13+08:00</updated><id>https://blog.fiepi.com/</id><title type="html">玛修·基列莱特</title><subtitle>先輩最低です</subtitle><author><name>Mash Kyrielight</name><email>im@fiepi.com</email></author><entry><title type="html">记录 ArchLinux 下部署 Moebooru 的过程</title><link href="https://blog.fiepi.com/archlinux/archlinux-deploy-moebooru.html" rel="alternate" type="text/html" title="记录 ArchLinux 下部署 Moebooru 的过程" /><published>2019-03-15T00:00:00+08:00</published><updated>2019-03-15T00:00:00+08:00</updated><id>https://blog.fiepi.com/archlinux/archlinux-deploy-moebooru</id><content type="html" xml:base="https://blog.fiepi.com/archlinux/archlinux-deploy-moebooru.html">&lt;p&gt;&lt;a href=&quot;https://github.com/moebooru/moebooru&quot;&gt;Moebooru&lt;/a&gt; 是一个基于 Danbooru1 修改的贴图版引擎， 比较有名的网站 konachan.com 和 yande.re 使用的正是该引擎。&lt;/p&gt;
+
+&lt;h2 id=&quot;需要的依赖包&quot;&gt;需要的依赖包&lt;/h2&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;git nodejs imagemagick jhead libxslt libyaml readline pcre openssl postgresql nginx ruby rubygems&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;配置数据库&quot;&gt;配置数据库&lt;/h2&gt;
+&lt;p&gt;新增一个用户名为 moebooru 的用户&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;useradd &lt;span class=&quot;nt&quot;&gt;-m&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; /home/moebooru moebooru&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;对数据库进行初始化配置&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-iu&lt;/span&gt; postgres
+&lt;span class=&quot;c&quot;&gt;# 数据库数据路径&lt;/span&gt;
+initdb &lt;span class=&quot;nt&quot;&gt;-D&lt;/span&gt; /var/lib/postgres/data
+&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# systemd 管理进程&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;systemctl start postgresql.service
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;systemctl status postgresql.service
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;postgresql.service
+
+&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-iu&lt;/span&gt; postgres
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;postgres@archlinux ~]&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;createuser &lt;span class=&quot;nt&quot;&gt;--interactive&lt;/span&gt;
+Enter name of role to add: moebooru
+Shall the new role be a superuser? &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;y/n&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; y
+&lt;span class=&quot;c&quot;&gt;# 修改用户密码&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;postgres@archlinux ~]&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;psql
+&lt;span class=&quot;nv&quot;&gt;postgres&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# ALTER USER moebooru WITH PASSWORD 'password'&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;postgres&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# \q&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# 创建数据库&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;postgres@archlinux ~]&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;createdb moebooru
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;postgres@archlinux ~]&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;安装-moebooru&quot;&gt;安装 Moebooru&lt;/h2&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-iu&lt;/span&gt; moebooru
+git clone https://github.com/moebooru/moebooru.git ~/live
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;live
+mkdir &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; public/data/&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;avatars,frame,frame-preview,image,inline,jpeg,preview,sample,search&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+cp config/database.yml.example config/database.yml
+cp config/local_config.rb.example config/local_config.rb
+gem install bundler:1.17.2
+&lt;span class=&quot;c&quot;&gt;# 安装缺失的依赖&lt;/span&gt;
+bundle install &lt;span class=&quot;nt&quot;&gt;--path&lt;/span&gt; ~/live/vendor/bundle
+&lt;span class=&quot;c&quot;&gt;# 生成密钥&lt;/span&gt;
+bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rake secret&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;config/local_config.rb 比较关键的配置&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;CONFIG[&lt;span class=&quot;s2&quot;&gt;&quot;secret_key_base&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;生成的密钥&quot;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Servers for static files (assets and uploaded files)&lt;/span&gt;
+CONFIG[:file_hosts] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; :files &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; CONFIG[&lt;span class=&quot;s2&quot;&gt;&quot;server_host&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;, :assets &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; CONFIG[&lt;span class=&quot;s2&quot;&gt;&quot;server_host&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;config/database.yml 数据库配置，填上数据库信用户息&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;    username: moebooru
+    password: password
+    host: localhost&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;config/init_config.rb&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;c&quot;&gt;# This is a salt used to make dictionary attacks on account passwords harder.&lt;/span&gt;
+CONFIG[&lt;span class=&quot;s2&quot;&gt;&quot;password_salt&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;your-hash-salt&quot;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# https 需要开启&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Set secure to false by default due to ssl requirement&lt;/span&gt;
+CONFIG[&lt;span class=&quot;s2&quot;&gt;&quot;secure&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# 开启之后 nginx 配置需要进行相应修改&lt;/span&gt;
+CONFIG[&lt;span class=&quot;s2&quot;&gt;&quot;use_pretty_image_urls&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;true
+&lt;/span&gt;CONFIG[&lt;span class=&quot;s2&quot;&gt;&quot;web_server&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;nginx&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;其余配置根据需要修改&lt;/p&gt;
+
+&lt;p&gt;初始化&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rake db:create
+bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rake db:reset
+bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rake db:migrate
+bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rake i18n:js:export
+bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rake assets:precompile&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;nginx-配置&quot;&gt;Nginx 配置&lt;/h2&gt;
+&lt;p&gt;用的是 &lt;a href=&quot;https://letsencrypt.org&quot;&gt;Let’s Encrypt&lt;/a&gt; 的免费证书&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;server &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; 
+	root /home/moebooru/live/public&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+	listen 443 ssl http2&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	
+	ssl_certificate /etc/letsencrypt/live/moe.fiepi.com/fullchain.pem&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	ssl_certificate_key /etc/letsencrypt/live/moe.fiepi.com/privkey.pem&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	include /etc/letsencrypt/options-ssl-nginx.conf&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+	resolver 8.8.8.8 8.8.4.4 &lt;span class=&quot;nv&quot;&gt;valid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;300s&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	resolver_timeout 5s&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+	server_name moe.fiepi.com&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+	location / &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; 
+		try_files /cache/&lt;span class=&quot;nv&quot;&gt;$uri&lt;/span&gt; /cache/&lt;span class=&quot;nv&quot;&gt;$uri&lt;/span&gt;.html &lt;span class=&quot;nv&quot;&gt;$uri&lt;/span&gt; @moe&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
+	location @moe &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        	expires off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; proxy_pass http://127.0.0.1:8080&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+        	proxy_set_header X-Forwarded-For &lt;span class=&quot;nv&quot;&gt;$proxy_add_x_forwarded_for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+        	proxy_set_header X-Real-IP &lt;span class=&quot;nv&quot;&gt;$remote_addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; proxy_redirect off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+        	proxy_set_header Host &lt;span class=&quot;nv&quot;&gt;$host&lt;/span&gt;:&lt;span class=&quot;nv&quot;&gt;$server_port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; proxy_set_header X-Forwarded-Proto &lt;span class=&quot;nv&quot;&gt;$scheme&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+		rewrite &lt;span class=&quot;s2&quot;&gt;&quot;^/image/([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{28})(/.*)?(&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[a-z]*)&quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/data/image/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$2&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1$2$3$5&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+		rewrite &lt;span class=&quot;s2&quot;&gt;&quot;^/sample/([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{28})(/.*)?(&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[a-z]*)&quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/data/sample/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$2&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1$2$3$5&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+server &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+	listen 80&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        server_name moe.fiepi.com&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	rewrite ^/&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;.&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; https://moe.fiepi.com/&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt; permanent&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;添加-systemd-配置&quot;&gt;添加 systemd 配置&lt;/h2&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;c&quot;&gt;# /etc/systemd/system/moebooru.service &lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Unit]
+&lt;span class=&quot;nv&quot;&gt;Description&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Moebooru
+&lt;span class=&quot;nv&quot;&gt;After&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;syslog.target
+&lt;span class=&quot;nv&quot;&gt;After&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;network.target
+
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Service]
+&lt;span class=&quot;nv&quot;&gt;Type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;simple
+&lt;span class=&quot;nv&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;moebooru
+&lt;span class=&quot;nv&quot;&gt;WorkingDirectory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/home/moebooru/live
+&lt;span class=&quot;nv&quot;&gt;ExecStart&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/home/moebooru/.gem/ruby/2.6.0/bin/bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;unicorn
+&lt;span class=&quot;nv&quot;&gt;Restart&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;always
+
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Install]
+&lt;span class=&quot;nv&quot;&gt;WantedBy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;multi-user.target&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;最后启动 moebooru.service 就 OK 了。&lt;/p&gt;
+
+&lt;p&gt;参考： &lt;a href=&quot;https://ioover.net/dev/moebooru-deploy-note&quot;&gt;Moebooru部署笔记&lt;/a&gt;&lt;/p&gt;</content><author><name>fiepi</name></author><category term="archlinux" /><category term="archlinux" /><category term="moebooru" /><category term="booru" /><summary type="html">Moebooru 是一个基于 Danbooru1 修改的贴图版引擎， 比较有名的网站 konachan.com 和 yande.re 使用的正是该引擎。</summary></entry><entry><title type="html">Kotlin: tailrec 修饰符优化尾递归</title><link href="https://blog.fiepi.com/kotlin/kotlin-tailrec.html" rel="alternate" type="text/html" title="Kotlin: tailrec 修饰符优化尾递归" /><published>2018-07-20T00:00:00+08:00</published><updated>2018-07-20T00:00:00+08:00</updated><id>https://blog.fiepi.com/kotlin/kotlin-tailrec</id><content type="html" xml:base="https://blog.fiepi.com/kotlin/kotlin-tailrec.html">&lt;p&gt;函数中所有递归形式的调用都出现在函数的末尾的情形称为尾递归。
 &lt;!-- more --&gt;
 Kotlin 支持尾递归，这允许一些通常用循环写的算法改用递归函数来写，而无堆栈溢出的风险。 当一个函数用 tailrec 修饰符标记并满足所需的形式时，编译器会优化该递归，留下一个快速而高效的基于循环的版本。&lt;/p&gt;
 

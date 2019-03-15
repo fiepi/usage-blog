@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+<head>
+  
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="description" content="先輩最低です">
+<meta name="keywords" content="Linux, Arch Linux, Android, Blog, and Shadowsocks">
+<meta name="author" content="记录 ArchLinux 下部署 Moebooru 的过程 | 玛修·基列莱特">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#e91e63">
+<meta name="google" content="notranslate">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记录 ArchLinux 下部署 Moebooru 的过程 | 玛修·基列莱特">
+<meta name="twitter:description" content="先輩最低です">
+<meta name="twitter:image" content="https://blog.fiepi.com/assets/img/logo.png">
+<meta property="og:type" content="blog">
+<meta property="og:url" content="https://blog.fiepi.com">
+<meta property="og:title" content="记录 ArchLinux 下部署 Moebooru 的过程 | 玛修·基列莱特">
+<meta property="og:description" content="先輩最低です">
+<meta property="og:image" content="https://blog.fiepi.com/assets/img/logo.png">
+<title>记录 ArchLinux 下部署 Moebooru 的过程 | 玛修·基列莱特</title>
+<link rel="canonical" href="https://blog.fiepi.com/archlinux/archlinux-deploy-moebooru.html">
+<link type="application/xml" rel="sitemap" href="https://blog.fiepi.com/sitemap.xml" title="记录 ArchLinux 下部署 Moebooru 的过程 | 玛修·基列莱特"/>
+<link type="application/atom+xml" rel="alternate" href="https://blog.fiepi.com/atom.xml" title="玛修·基列莱特" />
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Fira+Mono|Material+Icons|Quicksand">
+<link type="text/css" rel="stylesheet" href="https://blog.fiepi.com/assets/css/font-awesome.min.css">
+<link type="text/css" rel="stylesheet" href="https://blog.fiepi.com/assets/css/materialize.css" media="screen">
+<link type="text/css" rel="stylesheet" href="https://blog.fiepi.com/assets/css/prism.css">
+<link type="text/css" rel="stylesheet" href="https://blog.fiepi.com/assets/css/skeleton.css">
+<link type="text/css" rel="stylesheet" href="http://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css">
+<link type="text/css" rel="stylesheet" href="https://blog.fiepi.com/assets/css/style.css">
+<link type="text/css" rel="stylesheet" href="https://blog.fiepi.com/assets/css/syntax.css">
+<link type="text/css" rel="stylesheet" href="https://blog.fiepi.com/assets/css/headroom.css">
+</head>
+
+<body>
+  <header>
+    <div class="navbar-fixed">
+<nav>
+    <div class="nav-wrapper">
+      <a class="brand-logo logo-font center" href="https://blog.fiepi.com" style="max-width: 60%; max-height: 56px; overflow: hidden;">玛修·基列莱特</a>
+      <a class="button-collapse" data-activates="mobile-nav" href="#"><i class="material-icons">menu</i></a>
+    </nav>
+</div>
+
+<ul class="side-nav" id="mobile-nav">
+    <li>
+      <div class="user-view">
+       <div class="background pink base"></div>
+       <img class="circle materialboxed" data-caption="Mash Kyrielight" src="https://github.com/onlymash.png" alt="Avatar">
+       <span class="white-text name">Mash Kyrielight</span>
+       
+       <a href="mailto:im@fiepi.com"><span class="white-text email">im@fiepi.com</span></a>
+       
+     </div>
+    </li>
+    <form>
+        <div class="input-field">
+          <input id="search" type="search" required>
+          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+          <i class="material-icons">close</i>
+        </div>
+    </form>
+   <li><a class="logo-font" href="https://blog.fiepi.com"><i class="material-icons">home</i>首页</a></li>
+   <li><a class="logo-font" href="https://blog.fiepi.com/categories.html"><i class="material-icons">dashboard</i>分类</a></li>
+   <li><a class="logo-font" href="https://blog.fiepi.com/archive.html"><i class="material-icons">archive</i>归档</a></li>
+   <li><a class="logo-font" href="https://blog.fiepi.com/tags.html"><i class="material-icons">chrome_reader_mode</i>页面和标签</a></li>
+   <div class="divider"></div>
+   <li><a class="logo-font" href="https://blog.fiepi.com/atom.xml"><i class="material-icons">rss_feed</i>RSS 订阅</a></li>
+   <li><a class="logo-font" href="https://www.fiepi.com"><i class="material-icons">domain</i>主页</a></li>
+   <li><a class="logo-font" href="https://blog.fiepi.com/about.html"><i class="material-icons">info</i>关于</a></li>
+</ul>
+
+<a href="#" data-activates="slide-out" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+<ul id="slide-out" class="side-nav fixed">
+    <li>
+       <div class="user-view">
+          <div class="background pink base"></div>
+          <img class="circle materialboxed" data-caption="Mash Kyrielight" src="https://github.com/onlymash.png" alt="Avatar">
+          <span class="white-text name">Mash Kyrielight</span>
+           
+           <a href="mailto:im@fiepi.com"><span class="white-text email">im@fiepi.com</span></a>
+           
+       </div>
+    </li>
+    <form>
+      <div class="input-field">
+        <input id="search" type="search" required>
+        <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+        <i class="material-icons">close</i>
+      </div>
+  </form>
+    <li><a class="logo-font" href="https://blog.fiepi.com"><i class="material-icons">home</i>首页</a></li>
+    <li><a class="logo-font" href="https://blog.fiepi.com/categories.html"><i class="material-icons">dashboard</i>分类</a></li>
+    <li><a class="logo-font" href="https://blog.fiepi.com/archive.html"><i class="material-icons">archive</i>归档</a></li>
+    <li><a class="logo-font" href="https://blog.fiepi.com/tags.html"><i class="material-icons">chrome_reader_mode</i>页面和标签</a></li>
+    <div class="divider"></div>
+    <li><a class="logo-font" href="https://blog.fiepi.com/atom.xml"><i class="material-icons">rss_feed</i>RSS 订阅</a></li>
+    <li><a class="logo-font" href="https://www.fiepi.com"><i class="material-icons">domain</i>主页</a></li>
+    <li><a class="logo-font" href="https://blog.fiepi.com/about.html"><i class="material-icons">info</i>关于</a></li>
+</ul>
+
+  </header>
+  <main>
+    <section>
+      
+
+<div class="container">
+  <div class="section">
+    <div class="row">
+      <div class="col s12">
+        <article>
+          <div class="card">
+            
+            <div class="card-content">
+              
+              <span class="card-title">记录 ArchLinux 下部署 Moebooru 的过程</span>
+              
+              <p style="font-weight: 600; margin-bottom: 10px;"><time datetime="">2019-03-15</time> | <a href="https://blog.fiepi.com/archlinux/archlinux-deploy-moebooru.html#disqus_thread" data-disqus-identifier="/archlinux/archlinux-deploy-moebooru">评论</a></p>
+              <div id="post-content">
+                <p><a href="https://github.com/moebooru/moebooru">Moebooru</a> 是一个基于 Danbooru1 修改的贴图版引擎， 比较有名的网站 konachan.com 和 yande.re 使用的正是该引擎。</p>
+
+<h2 id="需要的依赖包">需要的依赖包</h2>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">git nodejs imagemagick jhead libxslt libyaml readline pcre openssl postgresql nginx ruby rubygems</code></pre></figure>
+
+<h2 id="配置数据库">配置数据库</h2>
+<p>新增一个用户名为 moebooru 的用户</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo </span>useradd <span class="nt">-m</span> <span class="nt">-d</span> /home/moebooru moebooru</code></pre></figure>
+
+<p>对数据库进行初始化配置</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo</span> <span class="nt">-iu</span> postgres
+<span class="c"># 数据库数据路径</span>
+initdb <span class="nt">-D</span> /var/lib/postgres/data
+<span class="nb">exit</span>
+<span class="c"># systemd 管理进程</span>
+<span class="nb">sudo </span>systemctl start postgresql.service
+<span class="nb">sudo </span>systemctl status postgresql.service
+<span class="nb">sudo </span>systemctl <span class="nb">enable </span>postgresql.service
+
+<span class="nb">sudo</span> <span class="nt">-iu</span> postgres
+<span class="o">[</span>postgres@archlinux ~]<span class="nv">$ </span>createuser <span class="nt">--interactive</span>
+Enter name of role to add: moebooru
+Shall the new role be a superuser? <span class="o">(</span>y/n<span class="o">)</span> y
+<span class="c"># 修改用户密码</span>
+<span class="o">[</span>postgres@archlinux ~]<span class="nv">$ </span>psql
+<span class="nv">postgres</span><span class="o">=</span><span class="c"># ALTER USER moebooru WITH PASSWORD 'password'</span>
+<span class="nv">postgres</span><span class="o">=</span><span class="c"># \q</span>
+<span class="c"># 创建数据库</span>
+<span class="o">[</span>postgres@archlinux ~]<span class="nv">$ </span>createdb moebooru
+<span class="o">[</span>postgres@archlinux ~]<span class="nv">$ </span><span class="nb">exit</span></code></pre></figure>
+
+<h2 id="安装-moebooru">安装 Moebooru</h2>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">sudo</span> <span class="nt">-iu</span> moebooru
+git clone https://github.com/moebooru/moebooru.git ~/live
+<span class="nb">cd </span>live
+mkdir <span class="nt">-p</span> public/data/<span class="o">{</span>avatars,frame,frame-preview,image,inline,jpeg,preview,sample,search<span class="o">}</span>
+cp config/database.yml.example config/database.yml
+cp config/local_config.rb.example config/local_config.rb
+gem install bundler:1.17.2
+<span class="c"># 安装缺失的依赖</span>
+bundle install <span class="nt">--path</span> ~/live/vendor/bundle
+<span class="c"># 生成密钥</span>
+bundle <span class="nb">exec </span>rake secret</code></pre></figure>
+
+<p>config/local_config.rb 比较关键的配置</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">CONFIG[<span class="s2">"secret_key_base"</span><span class="o">]</span> <span class="o">=</span> <span class="s2">"生成的密钥"</span>
+<span class="c"># Servers for static files (assets and uploaded files)</span>
+CONFIG[:file_hosts] <span class="o">=</span> <span class="o">{</span> :files <span class="o">=&gt;</span> CONFIG[<span class="s2">"server_host"</span><span class="o">]</span>, :assets <span class="o">=&gt;</span> CONFIG[<span class="s2">"server_host"</span><span class="o">]</span> <span class="o">}</span></code></pre></figure>
+
+<p>config/database.yml 数据库配置，填上数据库信用户息</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">    username: moebooru
+    password: password
+    host: localhost</code></pre></figure>
+
+<p>config/init_config.rb</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># This is a salt used to make dictionary attacks on account passwords harder.</span>
+CONFIG[<span class="s2">"password_salt"</span><span class="o">]</span> <span class="o">=</span> <span class="s2">"your-hash-salt"</span>
+<span class="c"># https 需要开启</span>
+<span class="c"># Set secure to false by default due to ssl requirement</span>
+CONFIG[<span class="s2">"secure"</span><span class="o">]</span> <span class="o">=</span> <span class="nb">true</span>
+<span class="c"># 开启之后 nginx 配置需要进行相应修改</span>
+CONFIG[<span class="s2">"use_pretty_image_urls"</span><span class="o">]</span> <span class="o">=</span> <span class="nb">true
+</span>CONFIG[<span class="s2">"web_server"</span><span class="o">]</span> <span class="o">=</span> <span class="s2">"nginx"</span></code></pre></figure>
+
+<p>其余配置根据需要修改</p>
+
+<p>初始化</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">bundle <span class="nb">exec </span>rake db:create
+bundle <span class="nb">exec </span>rake db:reset
+bundle <span class="nb">exec </span>rake db:migrate
+bundle <span class="nb">exec </span>rake i18n:js:export
+bundle <span class="nb">exec </span>rake assets:precompile</code></pre></figure>
+
+<h2 id="nginx-配置">Nginx 配置</h2>
+<p>用的是 <a href="https://letsencrypt.org">Let’s Encrypt</a> 的免费证书</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">server <span class="o">{</span> 
+	root /home/moebooru/live/public<span class="p">;</span> 
+	listen 443 ssl http2<span class="p">;</span>
+	
+	ssl_certificate /etc/letsencrypt/live/moe.fiepi.com/fullchain.pem<span class="p">;</span>
+	ssl_certificate_key /etc/letsencrypt/live/moe.fiepi.com/privkey.pem<span class="p">;</span>
+	include /etc/letsencrypt/options-ssl-nginx.conf<span class="p">;</span>
+	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem<span class="p">;</span>
+
+	resolver 8.8.8.8 8.8.4.4 <span class="nv">valid</span><span class="o">=</span>300s<span class="p">;</span>
+	resolver_timeout 5s<span class="p">;</span>
+
+	server_name moe.fiepi.com<span class="p">;</span>
+
+	location / <span class="o">{</span> 
+		try_files /cache/<span class="nv">$uri</span> /cache/<span class="nv">$uri</span>.html <span class="nv">$uri</span> @moe<span class="p">;</span> 
+	<span class="o">}</span> 
+	location @moe <span class="o">{</span>
+        	expires off<span class="p">;</span> proxy_pass http://127.0.0.1:8080<span class="p">;</span> 
+        	proxy_set_header X-Forwarded-For <span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span> 
+        	proxy_set_header X-Real-IP <span class="nv">$remote_addr</span><span class="p">;</span> proxy_redirect off<span class="p">;</span> 
+        	proxy_set_header Host <span class="nv">$host</span>:<span class="nv">$server_port</span><span class="p">;</span> proxy_set_header X-Forwarded-Proto <span class="nv">$scheme</span><span class="p">;</span>
+		rewrite <span class="s2">"^/image/([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{28})(/.*)?(</span><span class="se">\.</span><span class="s2">[a-z]*)"</span> <span class="s2">"/data/image/</span><span class="nv">$1</span><span class="s2">/</span><span class="nv">$2</span><span class="s2">/</span><span class="nv">$1$2$3$5</span><span class="s2">"</span><span class="p">;</span>
+		rewrite <span class="s2">"^/sample/([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{28})(/.*)?(</span><span class="se">\.</span><span class="s2">[a-z]*)"</span> <span class="s2">"/data/sample/</span><span class="nv">$1</span><span class="s2">/</span><span class="nv">$2</span><span class="s2">/</span><span class="nv">$1$2$3$5</span><span class="s2">"</span><span class="p">;</span>
+    	<span class="o">}</span>
+<span class="o">}</span>
+
+server <span class="o">{</span>
+	listen 80<span class="p">;</span>
+        server_name moe.fiepi.com<span class="p">;</span>
+	rewrite ^/<span class="o">(</span>.<span class="k">*</span><span class="o">)</span> https://moe.fiepi.com/<span class="nv">$1</span> permanent<span class="p">;</span>
+<span class="o">}</span></code></pre></figure>
+
+<h2 id="添加-systemd-配置">添加 systemd 配置</h2>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># /etc/systemd/system/moebooru.service </span>
+<span class="o">[</span>Unit]
+<span class="nv">Description</span><span class="o">=</span>Moebooru
+<span class="nv">After</span><span class="o">=</span>syslog.target
+<span class="nv">After</span><span class="o">=</span>network.target
+
+<span class="o">[</span>Service]
+<span class="nv">Type</span><span class="o">=</span>simple
+<span class="nv">User</span><span class="o">=</span>moebooru
+<span class="nv">WorkingDirectory</span><span class="o">=</span>/home/moebooru/live
+<span class="nv">ExecStart</span><span class="o">=</span>/home/moebooru/.gem/ruby/2.6.0/bin/bundle <span class="nb">exec </span>unicorn
+<span class="nv">Restart</span><span class="o">=</span>always
+
+<span class="o">[</span>Install]
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target</code></pre></figure>
+
+<p>最后启动 moebooru.service 就 OK 了。</p>
+
+<p>参考： <a href="https://ioover.net/dev/moebooru-deploy-note">Moebooru部署笔记</a></p>
+
+              </div>
+              
+              <div class="divider" style="margin: 16px 0;"></div>
+              
+                <div class="chip">archlinux</div>
+              
+                <div class="chip">moebooru</div>
+              
+                <div class="chip">booru</div>
+              
+            </div>
+          </div>
+        </article>
+      </div>
+      
+      <div class="col s12">
+        <article>
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">评论</span>
+              <div id="disqus_thread"></div>
+
+<script>
+  /**
+   *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+   *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+   */
+  var disqus_config = function () {
+    this.page.url = "https://blog.fiepi.com/archlinux/archlinux-deploy-moebooru.html";
+    this.page.identifier = "/archlinux/archlinux-deploy-moebooru";
+  };
+  (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://fiepi.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+            </div>
+          </div>
+        </article>
+      </div>
+      
+      <div class="col s12">
+        
+        
+        <div class="right">
+          <span style="color: rgba(0,0,0,.87); margin-right: 8px;">上一篇</span>
+          <a class="btn-floating waves-effect waves-light white" href="https://blog.fiepi.com/kotlin/kotlin-tailrec.html"><i class="material-icons" style="color: rgba(0,0,0,.87);">arrow_forward</i></a>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="dsq-count-scr" src="//fiepi.disqus.com/count.js" async></script>
+
+
+    </section>
+  </main>
+  <footer class="page-footer">
+    <div class="center" style="margin-top: 16px;">
+  <table>
+    <tr>
+      <div align="center">
+        <span style="font-size: 12px; font-weight: 400; min-height: 31px;">
+          <a style="color:lightgray">玛修·基列莱特 由 </a>
+          <a style="color:white" href="https://jekyllrb.com/">Jekyll </a>
+          <a style="color:lightgray">驱动 | 主题 - </a>
+          <a style="color:white" href="https://github.com/Astro36/Materialize-Jekyll">Materialize-Jekyll</a>         
+          <br>
+          <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.zh"><img src="https://licensebuttons.net/l/by-sa/4.0/80x15.png" alt="CC BY-SA"></a>
+          <a style="color:lightgray">若无特殊声明，本站以</a>
+          <a style="color:white" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh">知识共享 署名-相同方式共享 4.0 国际 许可协议</a>
+          <a style="color:lightgray">授权这里的文字内容。</a>
+        </span>
+      </div>
+    </tr>
+  </table>
+</div>
+<div class="footer-copyright">
+  <div class="container">
+    © 2019 Mash Kyrielight. All rights reserved.
+    <div class="right">
+      <span class="white-text" style="font-weight: 400; margin-right: 5px;">View on</span><a class="fa fa-github fa-lg white-text" href="https://github.com/onlymash"></a>
+    </div>
+  </div>
+</div>
+
+  </footer>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="https://blog.fiepi.com/assets/js/materialize.min.js"></script>
+<script type="text/javascript" src="https://blog.fiepi.com/assets/js/prism.min.js"></script>
+<script type="text/javascript" src="https://blog.fiepi.com/assets/js/headroom.min-0.9.4.js"></script>
+<script>
+(function() {
+  new Headroom(document.querySelector(".navbar-fixed"), {
+    offset : 5,
+    tolerance: 5,
+    classes: {
+      initial: "animated",
+      pinned: "slideUp",
+      unpinned: "slideDown"
+    }
+  }).init();
+}());
+</script>
+<script type="text/javascript">
+  var now = new Date('2019-03-15 16:32:13 +0800').getTime();
+  $(document).ready(function () {
+    $('.button-collapse').sideNav();
+    $('.collapsible').collapsible();
+    $('.dropdown-button').dropdown();
+    $('.materialboxed').materialbox();
+    $('.parallax').parallax();
+    $('time').each(function () {
+      if (now - (new Date($(this).attr('datetime')).getTime()) < 311040000){
+        $(this).append('<span class="new badge"></span>');
+      }
+    });
+    var url = window.location.href;
+    if (url.search('/') >= 0 || url.search('/archive') >= 0 || url.search('/categories') >= 0 || url.search('/tags') >= 0 || url.search('/2017/') >= 0) {
+      $('#nav-blog').collapsible('open', 0);
+    }
+  });
+</script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create','UA-98638990-2','auto');ga('send','pageview');
+</script>
+
+
+</body>
+</html>
